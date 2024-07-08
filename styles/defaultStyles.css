@@ -1,0 +1,135 @@
+/*    REMOVE DEFAULT MARGIN, PADDING AND FIX BOX SIZING    */
+* {
+    margin:0!important;
+    padding:0!important;
+    box-sizing: border-box!important;
+}
+
+
+
+/*    VARIABLES    */
+:root {
+    --bs-body-font-family: "Poppins"!important;      /* font */
+    --bs-body-color: #C4CAD1!important;            /* text color */
+    --bs-body-color-hover: #eef0f1!important;      /* text color */
+    --bs-body-bg: #191D26!important;               /* body background */
+    --bs-primary-rgb: 21, 22, 27!important;          /* primary element background */
+    --bs-secondary-rgb: 67, 75, 94!important;        /* secondary element background */
+    --bs-tertiary-rgb: 41, 47, 81!important;         /* tertiary element background */
+    --bs-accent-rgb: 47, 65, 156 !important;         /* accent element background */
+    --round-radius: 0.25rem;                         /* border radius for round elements */
+    --aside-width-px: 300px;                         /* specified width for the aside element for sidebars */
+}
+
+
+
+/*    CUSTOM SCROLLBAR    */
+::-webkit-scrollbar-track {background:transparent;}
+::-webkit-scrollbar-thumb {background:var(--bs-body-color);border-radius:5px;}
+::-webkit-scrollbar-thumb:hover {background:var(--bs-body-color);}
+::-webkit-scrollbar {width:5px;height:7px}
+
+
+
+/*    CUSTOM ELEMENT COLOR CLASSES    */
+.bg-tertiary {background-color: rgba(var(--bs-tertiary-rgb), 1);}
+
+.bg-accent {background-color: rgba(var(--bs-accent-rgb), 1);}
+
+button:hover, a:hover {color: var(--bs-body-color-hover)!important;}
+
+
+a:not(.button) {color: rgba(var(--bs-accent-rgb),0.8)!important;text-decoration:none;font-weight:bold;cursor:pointer;}
+a:not(.button):hover {color: rgba(var(--bs-accent-rgb),1)!important;text-decoration:underline;}
+
+.danger-bg-hover:hover {background-color: rgba(var(--bs-danger-rgb), 1)!important;}
+a.whiteLink.danger-text-hover:hover, .danger-text-hover:hover {color: rgba(var(--bs-danger-rgb), 1)!important;}
+
+.bg-hover-tertiary:hover {background-color: rgba(var(--bs-tertiary-rgb), 1)}
+
+a.whiteLink {color:var(--bs-body-color)!important}
+a.whiteLink:hover {color:var(--bs-body-color-hover)!important}
+
+a.disabled {color: #9ba0a5;cursor: not-allowed;text-decoration: line-through;}
+
+
+/*    CUSTOM BUTTON ELEMENT    */
+.button {
+    background-color: rgba(var(--bs-accent-rgb),0.9);
+    color: var(--bs-body-color);
+    text-decoration: none;
+    padding:1em 0!important;
+    font-weight: bold;
+    width:100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    cursor: pointer;
+    border-radius:var(--round-radius);
+}
+.button.square {padding:0!important;width:40px;height:40px;}
+
+.button:hover {
+    background-color: rgba(var(--bs-accent-rgb),1);
+    color: var(--bs-body-color-hover);
+}
+
+
+
+/*    DEFAULT FLEX CENTER CLASS    */
+.flex-center {display:flex;justify-content:center;align-items:center;}
+
+
+
+/*    DRAGABLE ELEMENTS    */
+.drag {-webkit-app-region: drag;}
+.drag button {-webkit-app-region: no-drag;}
+
+
+
+/*    WINDOW TOP BAR    */
+.windowMenuBar {position: fixed;width:100%;z-index: 3;}
+.windowMenuBar button {
+    cursor: pointer;
+    outline: 0;
+    border: 0;
+    background-color: transparent;
+    color: var(--bs-body-color);
+    font-size: 0.8em;
+    height:33px;
+    width:33px;
+}
+.windowMenuBar button:hover {background-color: var(--bs-body-bg);}
+
+
+.windowMenuBar h1 {
+    font-size: 0.9em;
+    padding-left:1rem!important;
+}
+
+
+
+/*    INPUTS    */
+input, select {
+    border:0;
+    outline: 0;
+    padding:1em!important;
+    background-color: rgba(var(--bs-secondary-rgb),1);
+    color: var(--bs-body-color);
+    border-radius: var(--round-radius);
+}
+
+
+
+/*    MAIN    */
+main {height:100vh;}
+
+
+
+/*    FOOTER    */
+footer {position: fixed;width:100%;bottom:0;}
+
+
+
+.underline {text-decoration: underline!important;}

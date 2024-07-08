@@ -1,0 +1,28 @@
+{
+  "name": "multi-cast",
+  "productName": "Multi Cast",
+  "author": "Rage",
+  "version": "1.1.0",
+  "description": "MultiCast - Starbase Multiview.",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "package": "electron-builder"
+  },
+  "keywords": [],
+  "license": "ISC",
+  "dependencies": {
+    "jquery": "^3.7.1",
+    "uuid": "^10.0.0"
+  },
+  "devDependencies": {
+    "electron": "^30.0.0",
+    "electron-builder": "^25.0.0-alpha.9"
+  },
+  "build": {
+    "appId": "com.Rage.MultiCast",
+    "win": {
+      "icon": "icons/multiCastIcon-256.png"
+    }
+  }
+}
