@@ -1,3 +1,20 @@
+.windowMenuBar {position:fixed;top:0;width:100%;z-index: 3;height:33px}
+
+
+
+/*    INPUTS    */
+input, select {
+    border:0;
+    outline: 0;
+    padding:1em!important;
+    background-color: rgba(var(--bs-secondary-rgb),1);
+    color: var(--bs-body-color);
+    border-radius: var(--round-radius);
+}
+
+
+
+
 /*   FEED CARDS CONTAINER   */
 main {width:90%;margin-inline:auto!important;overflow:hidden;padding-bottom:7em!important;height:100%;}
 .feedCards {margin-top:50px!important;overflow-x: scroll;width:100%;}
@@ -43,13 +60,6 @@ main {width:90%;margin-inline:auto!important;overflow:hidden;padding-bottom:7em!
 
 
 
-/*   FOOTER   */
-
-footer {border-top:1px solid rgba(var(--bs-accent-rgb),1)}
-.footer-wrapper {width:80%;margin-inline:auto!important}
-@media only screen and (max-width:1200px) {.footer-wrapper {width:100%}}
-
-footer p {font-size:0.8em}
 
 
 .outputContainer {

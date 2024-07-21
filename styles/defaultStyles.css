@@ -19,6 +19,8 @@
     --bs-accent-rgb: 47, 65, 156 !important;         /* accent element background */
     --round-radius: 0.25rem;                         /* border radius for round elements */
     --aside-width-px: 300px;                         /* specified width for the aside element for sidebars */
+
+    --vh-100---33px: calc(100vh - 33px);             /* used for height of main, iframe and audio elements */
 }
 
 
@@ -89,7 +91,8 @@ a.disabled {color: #9ba0a5;cursor: not-allowed;text-decoration: line-through;}
 
 
 /*    WINDOW TOP BAR    */
-.windowMenuBar {position: fixed;width:100%;z-index: 3;}
+.windowMenuBar {width:100%;z-index: 3;height:33px}
+.windowMenuBar .appFuncs {margin-left:auto;}
 .windowMenuBar button {
     cursor: pointer;
     outline: 0;
@@ -110,25 +113,22 @@ a.disabled {color: #9ba0a5;cursor: not-allowed;text-decoration: line-through;}
 
 
 
-/*    INPUTS    */
-input, select {
-    border:0;
-    outline: 0;
-    padding:1em!important;
-    background-color: rgba(var(--bs-secondary-rgb),1);
-    color: var(--bs-body-color);
-    border-radius: var(--round-radius);
-}
-
-
-
 /*    MAIN    */
-main {height:100vh;}
+main {height:var(--vh-100---33px);}
 
 
 
 /*    FOOTER    */
 footer {position: fixed;width:100%;bottom:0;}
+
+/*   FOOTER   */
+
+footer {border-top:1px solid rgba(var(--bs-accent-rgb),1)}
+.footer-wrapper {width:80%;margin-inline:auto!important}
+@media only screen and (max-width:1200px) {.footer-wrapper {width:100%}}
+
+footer {font-size:0.8em}
+footer .col:first-of-type {font-size:1.1em;}
 
 
 

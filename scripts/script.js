@@ -4,8 +4,9 @@ const shell = require('electron').shell;
 configSynced = true
 
 
-function openWindow(url) {
-    ipcRenderer.send("openWindow",url)
+function openWindow(url, feedCount) {
+    console.log(feedCount)
+    ipcRenderer.send("openWindow", {"url": url, "feedCount": feedCount})
 }
 
 
@@ -39,8 +40,8 @@ function getConfig() {
 
 function writeToConfig(configData) {
     localStorage.setItem("rage.multicast.config", JSON.stringify(configData))
-    configSynced = false
-    toggleSyncButton()
+    // configSynced = false
+    // toggleSyncButton()
 }
 
 function toggleSyncButton() {
@@ -52,6 +53,43 @@ function toggleSyncButton() {
 
 
 
-function openRageDC() {
-    shell.openExternal('https://discordapp.com/users/693191740961718420')
+function openExternalURL(url) {
+    shell.openExternal(url)
+}
+
+
+
+function copyCredits(feedData) {
+    feedId = feedData.feedid
+    creditOutputIndex = feedData.outputindex
+    creditFeedIndex = feedData.feedindex
+
+    
+    let feedName = ""
+    let videoId = ""
+
+
+    if (creditOutputIndex === 'undefined' || creditFeedIndex === 'undefined') {
+        // if output location is not present, update data in feedList
+        for (let i=0;i<config.feedList.length;i++) {
+            if (config.feedList[i].feedId == feedId) {
+                feedName = config.feedList[i].feedName
+                videoId = config.feedList[i].videoId
+                break
+            }
+        }
+    }   else {
+        let feedObj = config.outputs[parseInt(creditOutputIndex)].feeds[parseInt(creditFeedIndex)]
+        feedName = feedObj.feedName
+        videoId = feedObj.videoId
+    }
+
+
+    navigator.clipboard.writeText(`[ Credit: [${feedName}](<https://youtube.com/watch?v=${videoId}>) ]`)
+}
+
+
+
+function refreshOutputs(outputIndex, feedIndex, mode) {
+    ipcRenderer.send("resync-config",JSON.stringify({outputIndex:outputIndex, feedIndex:feedIndex, mode:mode}))
 }

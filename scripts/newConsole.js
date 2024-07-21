@@ -20,7 +20,7 @@ async function initFeeds() {
             <div class="feedCard output" draggable="true" ondragstart="dragStart(this, event)" id="feed_${feed.feedId}">
                 <div class="feedTitle d-flex bg-primary px-3 justify-content-between">
                     <h4>${feed.feedName}</h4>
-                    <a class="whiteLink fs-2" onclick="removeFeed(this)"><i class="bi bi-x"></i></a>
+                    <a class="whiteLink fs-2" onclick="addFeed({feedid:'${feed.feedId}',outputindex:'undefined',feedindex:'undefined'},true,false)"><i class="bi bi-x"></i></a>
                 </div>
                 <div class="feedPreview d-flex align-items-center justify-content-center">
                     <img src="https://i.ytimg.com/vi/${feed.videoId}/maxresdefault.jpg" draggable="false">
@@ -65,6 +65,7 @@ function generateGridItems(numDivs, container, outputIndex, edit) {
         }
 
         writeToConfig(config)
+        refreshOutputs(outputIndex,null,`REFRESHWINDOW_${numDivs}`)
     }
 
 
@@ -132,7 +133,7 @@ function initOutputs() {
         <div class="outputWrapper">
             <div class="bg-primary d-flex py-1 px-2 align-items-center">
                 Output ${toAlpha(i+1)} - <input type="text" value="${output.outputName}" oninput="updateOutputName(this.value, ${i})" class="p-2 py-1 ms-1" maxlength="18" placeholder="Output Name">
-                <a class="whiteLink ms-auto p-2" onclick="openWindow('output.html?outputPage=${i}')"><i class="ms-2 bi bi-box-arrow-up-right"></i></a>
+                <a class="whiteLink ms-auto p-2" onclick="openWindow('output.html?outputPage=${i}', this.parentNode.parentNode.querySelectorAll('input')[1].value)"><i class="ms-2 bi bi-box-arrow-up-right"></i></a>
             </div>
             <div class="outputContainer d-flex flex-wrap bg-primary h-100" id="output-container-${i}"></div>
             <div class="bg-primary d-flex align-items-center gap-3 p-2">
@@ -238,6 +239,9 @@ function previewDrop(elem,event, outputIndexNew, outputFeedNumNew) {
     }
 
     writeToConfig(config)
+    console.log(outputIndex, outputFeedNum)
+    if (!isNaN(outputIndex) && !isNaN(outputFeedNum)) { refreshOutputs(outputIndex, outputFeedNum, 'REFRESH') }
+    refreshOutputs(outputIndexNew, outputFeedNumNew, 'REFRESH')
 }
 
 
@@ -268,7 +272,9 @@ function removeFeed(xButton) {
         config.feedList.push(config.outputs[outputIndex].feeds[feedIndex])
         config.outputs[outputIndex].feeds[feedIndex] = {}
         
+        
         writeToConfig(config)
+        refreshOutputs(outputIndex, feedIndex, 'REFRESH')
         initFeeds()
     }   else {
         // if feed is in the feedList already, bring up the edit dialog for now
@@ -320,14 +326,6 @@ function initFeedCardContextMenu() {
     }}
 }
 initFeedCardContextMenu()
-
-
-function refreshOutputs() {
-    ipcRenderer.send("refreshOutputs",true)
-    configSynced = true
-    toggleSyncButton()
-}
-
 
 
 
@@ -409,6 +407,7 @@ function addFeed(feedData, deleting, editing) {
     
     // write config, refresh list, close modal
     writeToConfig(config)
+    if ((editing || deleting) && !(outputIndex === 'undefined' || feedIndex === 'undefined')) { refreshOutputs(outputIndex, feedIndex, 'REFRESH') }
 
     initFeeds()
     initOutputs()
@@ -476,39 +475,11 @@ function showEditFeedModal(feedData) {
 
 
 
-function copyCredits(feedData) {
-    feedId = feedData.feedid
-    outputIndex = feedData.outputindex
-    feedIndex = feedData.feedindex
-
-    
-    let feedName = ""
-    let videoId = ""
-
-
-    if (outputIndex === 'undefined' || feedIndex === 'undefined') {
-        // if output location is not present, update data in feedList
-        for (let i=0;i<config.feedList.length;i++) {
-            if (config.feedList[i].feedId == feedId) {
-                feedName = config.feedList[i].feedName
-                videoId = config.feedList[i].videoId
-                break
-            }
-        }
-    }   else {
-        let feedObj = config.outputs[parseInt(outputIndex)].feeds[parseInt(feedIndex)]
-        feedName = feedObj.feedName
-        videoId = feedObj.videoId
-    }
-
-
-    navigator.clipboard.writeText(`[ Credit: [${feedName}](<https://youtube.com/watch?v=${videoId}>) ]`)
-}
-
-
 function updateOutputName(nameValue, outputIndex) {
     if (nameValue === "" || nameValue == config.outputs[outputIndex].outputName) {return}
     
     config.outputs[outputIndex].outputName = nameValue
+
     writeToConfig(config)
+    refreshOutputs(outputIndex,null,`SETTITLE_${nameValue}`)
 }
