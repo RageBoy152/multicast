@@ -58,7 +58,7 @@ function createFeed() {
                     <a onclick='openExternalURL("https://www.youtube.com/live_chat?is_popout=1&dark_theme=true&v=${feedData.videoId}")' class="button square"><i class="bi bi-chat-left-text"></i></a>
                 </div>
             </div>
-            <webview id="feed-${feedIndex}-${feedData.videoId}" src="https://www.youtube.com/embed/${feedData.videoId}?autoplay=1"></webview>
+            <webview id="feed-${feedIndex}-${feedData.videoId}" src="https://www.youtube.com/embed/${feedData.videoId}?autoplay=1" allowfullscreen></webview>
         </div>
         `
     }
@@ -106,36 +106,49 @@ function createFeed() {
             document.querySelector('.ytp-volume-area').remove()
 
 
-            
-            //   INIT PLAYER VOLUME AT 1%   \\
+            volumeInitsialized = false
 
-            function generateTimestamps() {
-                // Get the current time in milliseconds since Unix epoch
-                let creationTime = Date.now()
+            if (JSON.parse(JSON.parse(localStorage.getItem('yt-player-volume')).data).volume == 1) {
+                volumeInitsialized = true
+            }
+
+
+            if (!volumeInitsialized) {
+            
+                //   INIT PLAYER VOLUME AT 1%   \\
+
+                function generateTimestamps() {
+                    // Get the current time in milliseconds since Unix epoch
+                    let creationTime = Date.now()
+                    
+                    // Calculate the expiration time as 30 days (30 * 24 * 60 * 60 * 1000 milliseconds) after the creation time
+                    let expirationTime = creationTime + (30 * 24 * 60 * 60 * 1000)
                 
-                // Calculate the expiration time as 30 days (30 * 24 * 60 * 60 * 1000 milliseconds) after the creation time
-                let expirationTime = creationTime + (30 * 24 * 60 * 60 * 1000)
-            
-                // Return the creation and expiration timestamps
-                return {
-                    creation: creationTime,
-                    expiration: expirationTime
+                    // Return the creation and expiration timestamps
+                    return {
+                        creation: creationTime,
+                        expiration: expirationTime
+                    }
                 }
+
+                ts = generateTimestamps()
+
+                volObj = {
+                    "data": '{\"volume\":1,\"muted\":false}',
+                    "expiration": ts.expiration,
+                    "creation": ts.creation
+                }
+
+
+                localStorage.setItem('yt-player-volume', JSON.stringify(volObj))
+
+                delete volObj.expiration
+                sessionStorage.setItem('yt-player-volume', JSON.stringify(volObj))
+
+                window.location.href = ""
             }
+            
 
-            ts = generateTimestamps()
-
-            volObj = {
-                "data": '{\"volume\":1,\"muted\":false}',
-                "expiration": ts.expiration,
-                "creation": ts.creation
-            }
-
-
-            localStorage.setItem('yt-player-volume', JSON.stringify(volObj))
-
-            delete volObj.expiration
-            sessionStorage.setItem('yt-player-volume', JSON.stringify(volObj))
 
 
 

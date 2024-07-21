@@ -30,7 +30,7 @@
 
 
 /*  volume input element  */
-input[type="range"] { appearance:none; background:transparent; height:100%; writing-mode: vertical-lr; padding:5em 1em!important; transform: scaleY(-1); }
+input[type="range"] { appearance:none; background:transparent; height:100%; writing-mode: vertical-lr; padding:1em 1em!important; transform: scaleY(-1); }
 
 
 /*  volume input track  */
@@ -48,9 +48,9 @@ input[type="range"] { appearance:none; background:transparent; height:100%; writ
     position: absolute;
 
     top:0; left:0;
-    width:7px; height:calc(100% - 10em);
+    width:7px; height:calc(100% - 2em);
 
-    margin-inline:5em;
+    margin-inline:1em;
     margin-left:16px;
     
     background: linear-gradient(180deg, rgba(25,194,41,1) 42%, rgba(199,210,7,1) 60%, rgba(187,5,5,1) 85%);

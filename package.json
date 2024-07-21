@@ -2,7 +2,7 @@
   "name": "multi-cast",
   "productName": "Multi Cast",
   "author": "Rage",
-  "version": "1.2.0",
+  "version": "1.2.2",
   "description": "MultiCast - Starbase Multiview.",
   "main": "main.js",
   "scripts": {

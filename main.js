@@ -84,7 +84,7 @@ function setPersistentWinBoundsDefaults() {
                 type: UpdateSourceType.ElectronPublicUpdateService,
                 repo: 'RageBoy152/multicast'
             },
-            updateInterval: '1 hour',
+            updateInterval: '15 minutes',
             logger: require('electron-log')
         })
     }
@@ -106,7 +106,7 @@ ipcMain.on('getSetting',async (e,key)=>{
 
 
 
-let display, width, height;
+let width, height;
 
 let feedWins = [];
 let feedTabs = [[],[],[]];
@@ -181,8 +181,8 @@ function createWindow(data) {
     url = data.url
 
     browserOptions = {
-        width: width,
-        height: height,
+        width: getWidthAndHeight()[0],
+        height: getWidthAndHeight()[1],
         frame: false,
         autoHideMenuBar: true,
         icon: path.join(__dirname, 'icons/multiCastIcon.png'),
@@ -253,9 +253,13 @@ function createWindow(data) {
             newHeight = feedWins[pageIndex].getSize()[1]            
 
             // if maxamized, use original dimensions            //  THIS THING UPDATE THIS THING PLS
+
+            feedWinBounds = feedWins[pageIndex].getBounds()
+            windowWidthHeight = getWidthAndHeight(feedWinBounds.x, feedWinBounds.y, feedWinBounds.width, feedWinBounds.height)
+            
             if (feedWins[pageIndex].isMaximized()) {
-                newWidth = originalDimensions[0]
-                newHeight = originalDimensions[1]
+                newWidth = windowWidthHeight[0]
+                newHeight = windowWidthHeight[1]
             }
 
             feedTabs[pageIndex].forEach((feedTab,i)=>{
@@ -408,13 +412,22 @@ function getFeedTabBounds(feedTabY, parentWinWidth, parentWinHeight, feedTabInde
 }
 
 
+function getWidthAndHeight(x,y,width,height) {
+    display = screen.getPrimaryDisplay()
+
+    if (!isNaN(x) && !isNaN(y))
+        display = screen.getDisplayNearestPoint({ "x":x+(width/2), "y":y+(height/2) })
+    
+    width = display.workAreaSize.width
+    height = display.workAreaSize.height
+
+    return [width, height]
+}
 
 
 app.on('ready', () => {
 
-    display = screen.getPrimaryDisplay()
-    width = display.workAreaSize.width
-    height = display.workAreaSize.height;
+    
 
 
     //   RUN ON STARTUP   \\
