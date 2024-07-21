@@ -1,6 +1,11 @@
 const { ipcMain, BaseWindow, WebContentsView, screen } = require('electron')
 const { app, BrowserWindow, Tray, Menu } = require('electron/main')
 const path = require('path')
+const { updateElectronApp, UpdateSourceType } = require('update-electron-app')
+const log = require('electron-log')
+
+
+log.transports.file.resolvePath = () => path.join(app.getPath('userData'), 'logs', 'main.log');
 
 
 
@@ -64,29 +69,47 @@ function setPersistentWinBoundsDefaults() {
     return data
 }
 
+// console.log(process.arch);
+// console.log(process.platform);
+// console.log(app.getVersion());
 
+// https://github.com/RageBoy152/multicast/win32-x64/1.2.2
 
 //   AUTO UPDATING   \\
 
-(async()=>{
-    autoUpdatePreference = await getStorageItem("autoUpdate")
-    if (!autoUpdatePreference) { return }
+(async () => {
+    try {
+        log.info("Fetching autoUpdate preference...")
+        const autoUpdatePreference = await getStorageItem("autoUpdate")
+
+        log.info("autoUpdatePreference:", autoUpdatePreference);
+
+        if (!autoUpdatePreference) {
+            log.info("Auto-update preference is false or undefined.")
+            return;
+        }
+
+        log.info("Checking if the app is packaged...")
+        if (app.isPackaged) {
+            log.info("App is packaged. Initializing auto-update...")
+
+            updateElectronApp({
+                updateSource: {
+                    type: UpdateSourceType.ElectronPublicUpdateService,
+                    repo: 'RageBoy152/multicast',
+                    host: 'https://github.com'
+                },
+                updateInterval: '15 minutes',
+                logger: log
+            })
 
 
-
-    //  will only run if autoUpdatePreference is true
-
-    const { updateElectronApp, UpdateSourceType } = require('update-electron-app')
-
-    if (app.isPackaged) {
-        updateElectronApp({
-            updateSource: {
-                type: UpdateSourceType.ElectronPublicUpdateService,
-                repo: 'RageBoy152/multicast'
-            },
-            updateInterval: '15 minutes',
-            logger: require('electron-log')
-        })
+            log.info("Auto-update initialized.")
+        } else {
+            log.info("App is not packaged. Auto-update not initialized.")
+        }
+    } catch (error) {
+        log.error('Error during auto-update:', error)
     }
 })()
 
