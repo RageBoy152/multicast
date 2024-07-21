@@ -204,6 +204,30 @@ function createWindow(data) {
         let feedWin = new BaseWindow(browserOptions)
 
 
+
+        //   PERSISTENT MAZIMIZE AND BOUNDS WINDOW
+
+        async function setBoundsToPersistent(pageIndex) {
+            persistentWinBounds = await getStorageItem("persistentWinBounds")
+            if (!persistentWinBounds) { persistentWinBounds = setPersistentWinBoundsDefaults() }
+            persistentWinBounds = JSON.parse(persistentWinBounds)
+
+
+            persistentBounds = persistentWinBounds.feedWins[pageIndex].bounds
+            
+            if (persistentWinBounds.feedWins[pageIndex].maximized) {
+                persistentBounds.width = originalDimensions[0]
+                persistentBounds.height = originalDimensions[1]
+            }
+
+
+            feedWins[pageIndex].setBounds(persistentBounds)
+            if (persistentWinBounds.feedWins[pageIndex].maximized) { feedWins[pageIndex].maximize() }
+        }
+        setBoundsToPersistent(outputPageIndex)
+
+
+
         parentWinWidth = feedWin.getBounds().width
         parentWinHeight = feedWin.getBounds().height
 
@@ -226,9 +250,9 @@ function createWindow(data) {
 
         feedWins[outputPageIndex].on('resize',((pageIndex)=>(e)=>{
             newWidth = feedWins[pageIndex].getSize()[0]
-            newHeight = feedWins[pageIndex].getSize()[1]
+            newHeight = feedWins[pageIndex].getSize()[1]            
 
-            // if maxamized, use original dimensions
+            // if maxamized, use original dimensions            //  THIS THING UPDATE THIS THING PLS
             if (feedWins[pageIndex].isMaximized()) {
                 newWidth = originalDimensions[0]
                 newHeight = originalDimensions[1]
@@ -260,28 +284,15 @@ function createWindow(data) {
 
 
         feedWins[outputPageIndex].on('move',((pageIndex)=>async(e)=>{
+            // if (feedWins[pageIndex].isMaximized()) { return }
+
             saveBoundsData(pageIndex)
         })(outputPageIndex));
         feedWins[outputPageIndex].on('resize',((pageIndex)=>async(e)=>{
+            // if (feedWins[pageIndex].isMaximized()) { return }
+
             saveBoundsData(pageIndex)
-
-            
         })(outputPageIndex));
-
-
-        
-        //   PERSISTENT MAZIMIZE AND BOUNDS WINDOW
-
-        async function setBoundsToPersistent(pageIndex) {
-            persistentWinBounds = await getStorageItem("persistentWinBounds")
-            if (!persistentWinBounds) { persistentWinBounds = setPersistentWinBoundsDefaults() }
-            persistentWinBounds = JSON.parse(persistentWinBounds)
-
-
-            feedWins[pageIndex].setBounds(persistentWinBounds.feedWins[pageIndex].bounds)
-            if (persistentWinBounds.feedWins[pageIndex].maximized) { feedWins[pageIndex].maximize() }
-        }
-        setBoundsToPersistent(outputPageIndex)
 
 
     }   else {
