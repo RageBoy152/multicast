@@ -29,6 +29,7 @@ function addNotification(notification, autoHide) {
     let toastId = uuidv4()
 
     if (notification.body != "") {
+        console.log(notification.body.length)
         if (notification.body.length > 600) {
             notification.body = `${notification.body.substring(0,600)}...`
         }
@@ -58,7 +59,7 @@ function addNotification(notification, autoHide) {
 
 
 ipcRenderer.on('update-downloaded',()=>{
-    addNotification({"title":"Update downloaded automatically","body":"Multicast must be restarted for the update to be installed.<a onclick='restartApp()' class='button bg-secondary mt-1 p-2 w-50'>Restart Now</a>","color":"success"}, 'false')
+    addNotification({"title":"Update downloaded automatically","body":"Please close and reopen MultiCast for the update to be installed.<a onclick='exitApp()' class='button bg-secondary mt-1 p-2 w-50'>Exit Now?</a>","color":"success"}, 'false')
 })
 ipcRenderer.on('update-error',(e,err)=>{
     addNotification({"title":"Error during auto update","body":err,"color":"danger"}, 'false')
@@ -66,8 +67,8 @@ ipcRenderer.on('update-error',(e,err)=>{
 
 
 
-function restartApp() {
-    ipcRenderer.send('restart-app')
+function exitApp() {
+    ipcRenderer.send('exit-app')
 }
 
 

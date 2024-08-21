@@ -92,7 +92,6 @@ function generateGridItems(numDivs) {
     for (let i=0; i<$('.output').length; i++) {
         if ($('.output')[i].querySelectorAll('webview')[0] == null) { continue }
 
-        console.log(i)
         initWebview($('.output')[i].querySelectorAll('webview')[0], i)
     }
 }
@@ -367,6 +366,8 @@ ipcRenderer.on('refresh-grid', (e,data)=>{
 
     }   else if (newFeedCount > $('.output').length) {
         // add outputs
+
+        //      THIS PART CAUSING RELOAD OF ALL FEEDS
         
         let temp = $('.output').length
         for (let i=0; i < (newFeedCount - temp); i++) {
@@ -387,4 +388,12 @@ ipcRenderer.on('refresh-grid', (e,data)=>{
 
     //  fix grid class
     generateGridClass(newFeedCount)
+
+
+    //  re init webviews
+    for (let i=0; i<$('.output').length; i++) {
+        if ($('.output')[i].querySelectorAll('webview')[0] == null) { continue }
+
+        initWebview($('.output')[i].querySelectorAll('webview')[0], i)
+    }
 })

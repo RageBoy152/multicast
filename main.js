@@ -422,11 +422,10 @@ autoUpdater.on('update-downloaded', () => {
     BrowserWindow.getFocusedWindow().webContents.send('update-downloaded')
 })
 
-ipcMain.on('restart-app', () => {
+ipcMain.on('exit-app', () => {
     // user wants to restart app to install update now
 
-    log.info("Restarting for update to be installed.")
-    app.relaunch()
+    log.info("Exiting for update to be installed.")
     app.quit()
 })
 
