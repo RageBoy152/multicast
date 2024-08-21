@@ -1,13 +1,20 @@
 const { ipcMain, BaseWindow, WebContentsView, screen } = require('electron')
 const { app, BrowserWindow, Tray, Menu } = require('electron/main')
 const path = require('path')
-const { updateElectronApp, UpdateSourceType } = require('update-electron-app')
+const { autoUpdater, AppUpdater } = require('electron-updater')
 const log = require('electron-log')
 
+const exePathFull = path.resolve(path.dirname(process.execPath), 'Multi Cast.exe')
 
-log.transports.file.resolvePath = () => path.join(app.getPath('userData'), 'logs', 'main.log');
+
+autoUpdater.autoDownload = false;
+autoUpdater.autoInstallOnAppQuit = true;
 
 
+log.transports.file.resolvePathFn = () => path.join(app.getPath('userData'), 'logs', 'main.log');
+
+
+log.info(`PATH FOR AUTO LAUNCH: ${exePathFull}`)
 
 
 async function getStorageItem(item) {
@@ -25,7 +32,6 @@ async function setStorageItem(item, data) {
 
 
 function setPersistentWinBoundsDefaults() {
-
     defaultConsoleBounds = {
         x: 0,
         y: 0,
@@ -69,55 +75,27 @@ function setPersistentWinBoundsDefaults() {
     return data
 }
 
-// console.log(process.arch);
-// console.log(process.platform);
-// console.log(app.getVersion());
 
-// https://github.com/RageBoy152/multicast/win32-x64/1.2.2
-
-//   AUTO UPDATING   \\
-
-(async () => {
-    try {
-        log.info("Fetching autoUpdate preference...")
-        const autoUpdatePreference = await getStorageItem("autoUpdate")
-
-        log.info("autoUpdatePreference:", autoUpdatePreference);
-
-        if (!autoUpdatePreference) {
-            log.info("Auto-update preference is false or undefined.")
-            return;
-        }
-
-        log.info("Checking if the app is packaged...")
-        if (app.isPackaged) {
-            log.info("App is packaged. Initializing auto-update...")
-
-            updateElectronApp({
-                updateSource: {
-                    type: UpdateSourceType.ElectronPublicUpdateService,
-                    repo: 'RageBoy152/multicast',
-                    host: 'https://github.com'
-                },
-                updateInterval: '15 minutes',
-                logger: log
-            })
-
-
-            log.info("Auto-update initialized.")
-        } else {
-            log.info("App is not packaged. Auto-update not initialized.")
-        }
-    } catch (error) {
-        log.error('Error during auto-update:', error)
-    }
-})()
 
 
 // toggle settings
 ipcMain.on('toggleSetting',async (e,key)=>{
-    autoUpdatePreference = await getStorageItem(key)
-    autoUpdatePreference ? setStorageItem(key, false) : setStorageItem(key, true)
+    setting = await getStorageItem(key)
+    setting ? setStorageItem(key, false) : setStorageItem(key, true)
+
+    if (key == 'runOnStartup' && app.isPackaged) {
+        // console.log(`SETTING DEV RUN ON STARTUP TO ${!setting}`)
+        app.setLoginItemSettings({
+            openAtLogin: !setting,
+            path: `"${exePathFull}"`,
+            args: [
+                "--processStart",
+                `"${path.basename(process.execPath)}"`
+              ]
+        })
+    }   else if (key == 'autoUpdate' && !setting) {
+        autoUpdater.checkForUpdates()
+    }
 })
 
 // get settings
@@ -132,69 +110,11 @@ ipcMain.on('getSetting',async (e,key)=>{
 let width, height;
 
 let feedWins = [];
-let feedTabs = [[],[],[]];
 let feedCounts = []
 
 let originalDimensions = []
 
 let browserOptions;
-
-
-
-
-function createFeedTabs(outputIndex, feedCount, feedWin, flag) {
-    if (feedCount == 3) {feedCount++}
-    if (feedCount >=6) {feedCount = 9}
-
-
-    for (let i=0;i<feedCount;i++) {
-        //  create new web view instance for feed "i"
-        const feedTab = new WebContentsView({
-            webPreferences: browserOptions.webPreferences
-        })
-
-        
-        // devtools = new BrowserWindow()
-        // feedTab.webContents.setDevToolsWebContents(devtools.webContents)
-        // feedTab.webContents.openDevTools({ mode: 'detach' })
-        
-
-        //  create feed url, remove feedcount param and add feed index param
-        feedURL = new URL(`file://${path.join(__dirname, url)}`)
-        feedURL.searchParams.set('feed', i)
-
-
-        //  load feedTab and add as child view to feedWin
-        feedTab.webContents.loadURL(feedURL.href)
-
-
-        // feedWins[outputIndex].contentView.addChildView(feedTab)      <-  breaks wtf why
-        flag ? feedWins[outputIndex].contentView.addChildView(feedTab) : feedWin.contentView.addChildView(feedTab)
-
-
-        //  set transform of feed tab
-        let parentWinWidth;
-        let parentWinHeight;
-
-        if (feedWin == 'null') {
-            parentWinWidth = feedWins[outputIndex].getBounds().width
-            parentWinHeight = feedWins[outputIndex].getBounds().height
-        }   else {
-            parentWinWidth = feedWin.getBounds().width
-            parentWinHeight = feedWin.getBounds().height
-        }
-
-
-        feedTab.setBounds(getFeedTabBounds(0, parentWinWidth, parentWinHeight, i, feedCount))
-        feedCounts[outputIndex] = (feedCount)
-
-
-        //  add feedTab to array
-        feedTabs[outputIndex].push(feedTab)
-    }
-
-    return feedWin
-}
 
 
 
@@ -224,7 +144,10 @@ function createWindow(data) {
         outputPageIndex = parseInt(new URL(`file://${path.join(__dirname, url)}`).searchParams.get('outputPage'))
 
 
-        let feedWin = new BaseWindow(browserOptions)
+        let feedWin = new BrowserWindow(browserOptions)
+
+        feedURL = new URL(`file://${path.join(__dirname, url)}`)
+        feedWin.loadURL(feedURL.href)
 
 
 
@@ -233,6 +156,7 @@ function createWindow(data) {
         async function setBoundsToPersistent(pageIndex) {
             persistentWinBounds = await getStorageItem("persistentWinBounds")
             if (!persistentWinBounds) { persistentWinBounds = setPersistentWinBoundsDefaults() }
+
             persistentWinBounds = JSON.parse(persistentWinBounds)
 
 
@@ -244,24 +168,14 @@ function createWindow(data) {
             }
 
 
-            feedWins[pageIndex].setBounds(persistentBounds)
-            if (persistentWinBounds.feedWins[pageIndex].maximized) { feedWins[pageIndex].maximize() }
+            feedWin.setBounds(persistentBounds)
+            if (persistentWinBounds.feedWins[pageIndex].maximized) { feedWin.maximize() }
         }
         setBoundsToPersistent(outputPageIndex)
 
 
-
-        parentWinWidth = feedWin.getBounds().width
-        parentWinHeight = feedWin.getBounds().height
-
-
-        // save original dimensions for resizig stuff
-        originalDimensions.push(parentWinWidth)
-        originalDimensions.push(parentWinHeight)
-
-
-        feedWin = createFeedTabs(outputPageIndex, data.feedCount, feedWin)
-        feedCounts[outputPageIndex] = data.feedCount
+        originalDimensions.push(feedWin.getBounds().width)
+        originalDimensions.push(feedWin.getBounds().height)
 
 
         //  add feedWin to array
@@ -269,30 +183,7 @@ function createWindow(data) {
 
 
 
-        //   ON RESIZE EVENT RECALCULATE BOUNDS OF TABS
-
-        feedWins[outputPageIndex].on('resize',((pageIndex)=>(e)=>{
-            newWidth = feedWins[pageIndex].getSize()[0]
-            newHeight = feedWins[pageIndex].getSize()[1]            
-
-            // if maxamized, use original dimensions            //  THIS THING UPDATE THIS THING PLS
-
-            feedWinBounds = feedWins[pageIndex].getBounds()
-            windowWidthHeight = getWidthAndHeight(feedWinBounds.x, feedWinBounds.y, feedWinBounds.width, feedWinBounds.height)
-            
-            if (feedWins[pageIndex].isMaximized()) {
-                newWidth = windowWidthHeight[0]
-                newHeight = windowWidthHeight[1]
-            }
-
-            feedTabs[pageIndex].forEach((feedTab,i)=>{
-                feedTab.setBounds(getFeedTabBounds(0, newWidth, newHeight, i, feedCounts[pageIndex]))
-            })
-        })(outputPageIndex));
-
-
-
-        //   ON MOVE EVENT SAVE BOUNDS DATA
+        //   ON MOVE & RESIZE EVENTS, SAVE BOUNDS DATA
 
         async function saveBoundsData(pageIndex) {
             // get persistent data
@@ -322,6 +213,8 @@ function createWindow(data) {
         })(outputPageIndex));
 
 
+
+        return
     }   else {
         //   REGULAR WINDOW
 
@@ -348,7 +241,7 @@ function createWindow(data) {
 
 
         if (url == 'console.html') {
-            //   PERSISTENT BOUNDS
+            //   SET BOUDNS TO PERSISTENT BOUNDS
 
             (async()=>{
                 persistentWinBounds = await getStorageItem("persistentWinBounds")
@@ -362,7 +255,8 @@ function createWindow(data) {
             })();
 
 
-            //   ON MOVE EVENT SAVE BOUNDS DATA
+
+            //   ON MOVE & RESIZE EVENTS, SAVE BOUNDS DATA
 
             async function saveConsoleBoundsData() {
                 // get persistent data
@@ -399,40 +293,6 @@ function createWindow(data) {
 }
 
 
-//   ALGORITHM TO GET FEED TAB BOUNDS BASED ON DIMENSIONS OF PARENT WINDOW
-
-function getFeedTabBounds(feedTabY, parentWinWidth, parentWinHeight, feedTabIndex, feedCount) {
-    let feedTabBounds = { x: 0, y: feedTabY, width: parentWinWidth, height: parentWinHeight }
-
-    if (feedCount == 2) {
-        feedTabBounds = { x: feedTabIndex*(parentWinWidth/2), y: feedTabY, width: parentWinWidth/2, height: parentWinHeight }
-    }
-    else if (feedCount == 3 || feedCount == 4) {
-        let y = feedTabY
-        if (feedTabIndex>1) { y = parentWinHeight/2 }
-
-        feedTabBounds = { x: (feedTabIndex%2)*(parentWinWidth/2), y: y, width: parentWinWidth/2, height: parentWinHeight/2 }
-    }
-    else if (feedCount == 5) {
-        let x = ((feedTabIndex+1)%2)*parentWinWidth/2
-        if (feedTabIndex<3) { x = (feedTabIndex%3)*parentWinWidth/3 }
-
-        let y = feedTabY
-        let width = parentWinWidth/3
-        if (feedTabIndex>2) { y += parentWinHeight/2; width = parentWinWidth/2 }
-
-        feedTabBounds = { x: x, y: y, width: width, height: parentWinHeight/2 }
-    }
-    else if (feedCount <= 9 && feedCount >= 6) {
-        let y = feedTabY
-        if (feedTabIndex >= 3 && feedTabIndex <= 5) { y += parentWinHeight/3 }
-        else if (feedTabIndex >= 6) { y += 2*(parentWinHeight/3) }
-
-        feedTabBounds = { x: (feedTabIndex%3)*(parentWinWidth/3), y: y, width: parentWinWidth/3, height: parentWinHeight/3 }
-    }
-
-    return { x: Math.ceil(feedTabBounds.x), y: Math.ceil(feedTabBounds.y), width: Math.ceil(feedTabBounds.width), height: Math.ceil(feedTabBounds.height)}
-}
 
 
 function getWidthAndHeight(x,y,width,height) {
@@ -448,21 +308,30 @@ function getWidthAndHeight(x,y,width,height) {
 }
 
 
-app.on('ready', () => {
+
+
+
+app.on('ready', async () => {
 
     
 
 
     //   RUN ON STARTUP   \\
 
-    (async()=>{
-        runOnStartupPreference = await getStorageItem("runOnStartup")
-    
-        app.setLoginItemSettings({
-            openAtLogin: runOnStartupPreference
-        })
-    })();
-    
+    if (app.isPackaged) {
+        (async()=>{
+            runOnStartupPreference = await getStorageItem("runOnStartup")
+        
+            app.setLoginItemSettings({
+                openAtLogin: runOnStartupPreference,
+                path: `"${exePathFull}"`,
+                args: [
+                    "--processStart",
+                    `"${path.basename(process.execPath)}"`
+                  ]
+            })
+        })();
+    }
     
 
 
@@ -506,7 +375,61 @@ app.on('ready', () => {
             createWindow( { "url": "console.html" } )
         }
     })
+
+
+    
+    //  CHECK FOR UPDATES BASED ON AUTO UPDATE PREFERENCE
+
+    try {
+        log.info("Fetching autoUpdate preference...")
+        const autoUpdatePreference = await getStorageItem("autoUpdate")
+
+        log.info("autoUpdatePreference:", autoUpdatePreference);
+
+        if (!autoUpdatePreference) { return }
+
+        autoUpdater.checkForUpdates()
+    }
+    catch (err) {
+        log.info(`Error fetching autoUpdate preference or checking for update: ${err}`)
+        console.log(`Error fetching autoUpdate preference or checking for update: ${err}`)
+    }
 })
+
+
+
+//   AUTO UPDATE EVENTS
+
+autoUpdater.on('update-available', () => {
+    // auto download update if available
+    
+    log.info("Update available, attempting to download.")
+    autoUpdater.downloadUpdate()
+})
+
+autoUpdater.on('error', (err) => {
+    // update error
+    
+    log.info(`Error during auto update: ${err}`)
+    BrowserWindow.getFocusedWindow().webContents.send('update-error',err)
+})
+
+autoUpdater.on('update-downloaded', () => {
+    // prompt user to restart app now to install update or dismiss
+
+    log.info("Update downloaded, prompting restart.")
+    
+    BrowserWindow.getFocusedWindow().webContents.send('update-downloaded')
+})
+
+ipcMain.on('restart-app', () => {
+    // user wants to restart app to install update now
+
+    log.info("Restarting for update to be installed.")
+    app.relaunch()
+    app.quit()
+})
+
 
 
 
@@ -523,16 +446,9 @@ ipcMain.on("close-btn",(e, data)=>{
     if (data === true)
         BrowserWindow.getFocusedWindow().close()
     else {
-        // destroy feed tabs in parent feed win
-        feedTabs[parseInt(data)].forEach(feedTab=>{
-            feedTab.webContents.destroy()
-        })
-        feedTabs[parseInt(data)] = []
-        
-
-        // destroy parent feed win
+        // destroy feed win
         feedWins[parseInt(data)].close()
-        feedWins[parseInt(data)] = []
+        feedWins[parseInt(data)] = null
     }
 })
 
@@ -567,25 +483,24 @@ ipcMain.on("resync-config",(e,data)=>{
 
 
     if (data.mode.startsWith('SETTITLE_')) {
-        if (!feedTabs[parseInt(data.outputIndex)][0]) { return }
+        //  update title because title changed
 
-        feedTabs[parseInt(data.outputIndex)][0].webContents.send("update-title", data.mode.split("SETTITLE_")[1])
+        if (!feedWins[data.outputIndex]) { return }        
+
+        feedWins[data.outputIndex].webContents.send("update-title", data.mode.split("SETTITLE_")[1])
     }
     else if (data.mode == 'REFRESH') {
-        if (!feedTabs[parseInt(data.outputIndex)][0]) { return }
+        // particular feed needs refreshing
+        
+        if (!feedWins[data.outputIndex]) { return }
 
-        feedTabs[parseInt(data.outputIndex)][data.feedIndex].webContents.send("refresh-feed")
+        feedWins[data.outputIndex].webContents.send("refresh-feed", data.feedIndex)
     }
     else if (data.mode.startsWith('REFRESHWINDOW_')) {
-        if (!feedWins[parseInt(data.outputIndex)] || feedWins[parseInt(data.outputIndex)].length === 0) { return }
+        //  update grid because feed count changed
 
+        if (!feedWins[data.outputIndex]) { return }
 
-        feedWins[parseInt(data.outputIndex)].contentView.children.forEach(feedWinChild=>{
-            feedWins[parseInt(data.outputIndex)].contentView.removeChildView(feedWinChild)
-        })
-        feedTabs[parseInt(data.outputIndex)] = []
-
-
-        createFeedTabs(parseInt(data.outputIndex), parseInt(data.mode.split("REFRESHWINDOW_")[1]), feedWins[parseInt(data.outputIndex)], true)
+        feedWins[data.outputIndex].webContents.send("refresh-grid", data.mode)
     }
 })

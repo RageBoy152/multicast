@@ -1,5 +1,8 @@
 window.$ = window.jQuery = require('jquery');
 const shell = require('electron').shell;
+const { v4: uuidv4 } = require('uuid');
+const { ipcRenderer } = require("electron")
+
 
 configSynced = true
 
@@ -8,6 +11,65 @@ function openWindow(url, feedCount) {
     console.log(feedCount)
     ipcRenderer.send("openWindow", {"url": url, "feedCount": feedCount})
 }
+
+
+
+function initToasts() {
+    const toastElList = document.querySelectorAll('.toast')
+    const toastList = [...toastElList].map(toastEl => new bootstrap.Toast(toastEl))
+}
+initToasts()
+
+
+
+function addNotification(notification, autoHide) {
+    if (!autoHide) { autoHide = 'true' }
+    let notiBody = ''
+    let toastHeaderBorder = 'border-0'
+    let toastId = uuidv4()
+
+    if (notification.body != "") {
+        if (notification.body.length > 600) {
+            notification.body = `${notification.body.substring(0,600)}...`
+        }
+        notiBody = `
+        <div class="toast-body rounded-0 p-3">
+            ${notification.body}
+        </div>
+        `
+
+        toastHeaderBorder = ''
+    }
+
+    
+
+    $('.toast-container')[0].innerHTML += `
+    <div id="${toastId}" class="toast rounded-0 border-${notification.color} border-top-0 border-bottom-0 border-start-0" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="${autoHide}" data-bs-delay=2000>
+        <div class="toast-header ${toastHeaderBorder} rounded-0 p-2 py-3">
+            <strong class="me-auto">${notification.title}</strong>
+            <a class="button square" data-bs-dismiss="toast" ><i class="bi bi-x-lg"></i></a>
+        </div>
+        ${notiBody}
+    </div>
+    `
+
+    bootstrap.Toast.getOrCreateInstance($(`#${toastId}`)[0]).show()
+}
+
+
+ipcRenderer.on('update-downloaded',()=>{
+    addNotification({"title":"Update downloaded automatically","body":"Multicast must be restarted for the update to be installed.<a onclick='restartApp()' class='button bg-secondary mt-1 p-2 w-50'>Restart Now</a>","color":"success"}, 'false')
+})
+ipcRenderer.on('update-error',(e,err)=>{
+    addNotification({"title":"Error during auto update","body":err,"color":"danger"}, 'false')
+})
+
+
+
+function restartApp() {
+    ipcRenderer.send('restart-app')
+}
+
 
 
 const toAlpha = (num) => {
@@ -86,6 +148,8 @@ function copyCredits(feedData) {
 
 
     navigator.clipboard.writeText(`[ Credit: [${feedName}](<https://youtube.com/watch?v=${videoId}>) ]`)
+
+    addNotification({"title":`Copied '${feedName}' credits to clipboard`,"body":"","color":"success"}, 'true')
 }
 
 

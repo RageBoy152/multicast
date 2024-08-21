@@ -1,6 +1,3 @@
-const { v4: uuidv4 } = require('uuid');
-
-
 document.addEventListener("dragover", (event) => {
     event.preventDefault()
 })
@@ -8,11 +5,15 @@ document.addEventListener("dragover", (event) => {
 
 config = getConfig()
 
+setInterval(() => {
+    config = getConfig()
+}, 1000)
+
 
 
 async function initFeeds() {
     $('.feedCards')[0].innerHTML = ''
-
+ 
     for (let i=0;i<config.feedList.length;i++) {
         feed = config.feedList[i]
 
@@ -50,6 +51,12 @@ function generateGridItems(numDivs, container, outputIndex, edit) {
 
 
     if (edit == 'true') {
+        inputElem = numDivs
+        numDivs = numDivs.value
+        if (numDivs > 9) { inputElem.value = 9;return }
+        else if (numDivs < 1 || isNaN(numDivs)) { return }
+
+
         // update num divs
         config.outputs[outputIndex].feedCount = parseInt(numDivs)
 
@@ -137,7 +144,7 @@ function initOutputs() {
             </div>
             <div class="outputContainer d-flex flex-wrap bg-primary h-100" id="output-container-${i}"></div>
             <div class="bg-primary d-flex align-items-center gap-3 p-2">
-                Feeds: <input class="py-1 px-2" type="number" value="${output.feedCount}" max="9" min="1" oninput="generateGridItems(this.value, this.parentNode.parentNode.getElementsByClassName('outputContainer')[0],${i},'true')">
+                Feeds: <input class="py-1 px-2" type="number" value="${output.feedCount}" max="9" min="1" oninput="generateGridItems(this, this.parentNode.parentNode.getElementsByClassName('outputContainer')[0],${i},'true')">
             </div>
         </div>
         `
@@ -276,6 +283,8 @@ function removeFeed(xButton) {
         writeToConfig(config)
         refreshOutputs(outputIndex, feedIndex, 'REFRESH')
         initFeeds()
+
+        addNotification({"title":`Removed feed '${feedNameDeleting}' from output ${toAlpha(parseInt(outputIndex) + 1)}`,"body":"","color":"success"}, 'true')
     }   else {
         // if feed is in the feedList already, bring up the edit dialog for now
         addFeedModal.toggle()
@@ -365,16 +374,25 @@ function addFeed(feedData, deleting, editing) {
     feedId = feedId
     if (feedId && deleting) {
         // deleting case
+
+        let feedNameDeleting;
+
         if (outputIndex === 'undefined' || feedIndex === 'undefined') {
             // if output location is not present, update data in feedList
             for (let i=0;i<config.feedList.length;i++) {
                 if (config.feedList[i].feedId == feedId) {
+                    feedNameDeleting = config.feedList[i].feedName
                     config.feedList.splice(i,1)
                 }
             }
         }   else {
+            feedNameDeleting = config.outputs[parseInt(outputIndex)].feeds[parseInt(feedIndex)].feedName
             config.outputs[parseInt(outputIndex)].feeds[parseInt(feedIndex)] = {}
         }
+
+        if (feedNameDeleting)
+            addNotification({"title":`Feed '${feedNameDeleting}' deleted`,"body":"","color":"success"}, 'true')
+    
     }   else if (feedId && editing) {
         // editing case
         newFeedData = {
@@ -393,6 +411,8 @@ function addFeed(feedData, deleting, editing) {
         }   else {
             config.outputs[parseInt(outputIndex)].feeds[parseInt(feedIndex)] = newFeedData
         }
+
+        addNotification({"title":`Feed '${feedName}' edited`,"body":"","color":"success"}, 'true')
     }   else {
         // adding new case
         config.feedList.push(
@@ -402,6 +422,7 @@ function addFeed(feedData, deleting, editing) {
                 "videoId": videoId
             }
         )
+        addNotification({"title":`Feed '${feedName}' added`,"body":"","color":"success"}, 'true')
     }
 
     

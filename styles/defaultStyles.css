@@ -113,6 +113,21 @@ a.disabled {color: #9ba0a5;cursor: not-allowed;text-decoration: line-through;}
 
 
 
+/*    NOTIFICATION TOASTS    */
+
+.toast-container {
+    margin-bottom: 70px!important;
+}
+
+.toast * {
+    background-color: rgba(var(--bs-primary-rgb),1)!important;
+    color: var(--bs-body-color);
+}
+
+.toast .button.square { width:25px; height:25px; }
+
+
+
 /*    MAIN    */
 main {height:var(--vh-100---33px);}
 
