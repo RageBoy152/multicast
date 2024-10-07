@@ -11,7 +11,7 @@
     "lint": "eslint .",
     "vite-preview": "vite preview",
     "electron-serve": "concurrently -k \"cross-env BROWSER=none yarn start\" \"yarn electron:start\"",
-    "electron-build": "cross-env EMAIL_ADDR=matthewm.uk@gmail.com EMAIL_PWD=\"suse jbyf ouij nnff\" yarn build && electron-builder -c.extraMetadata.main=build/main.js",
+    "electron-build": "node build.js",
     "electron-start": "wait-on tcp:5173 && electron ."
   },
   "repository": "https://github.com/RageBoy152/multicast",

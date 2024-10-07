@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, shell } = require('electron');
+const { app, BrowserWindow, ipcMain, shell, Tray, Menu } = require('electron');
 
 const nodemailer = require('nodemailer');
 const path = require('path');
@@ -57,7 +57,41 @@ async function runOnStartup() {
 
 
 
-async function createWin(route) {
+
+function createTray() {
+  const tray = new Tray(path.join(__dirname, 'favicon.png'));
+
+
+  const contextMenu = Menu.buildFromTemplate([
+    {
+      label: 'Open console',
+      click: () => {
+        let consoleWin;
+
+        BrowserWindow.getAllWindows().forEach(win => {
+          if (win.title == 'console') consoleWin = win; return;
+        })
+
+        if (consoleWin) {
+          consoleWin.restore();
+          consoleWin.focus();
+        }
+        else createWin('');
+      }
+    },
+    {
+      label: 'Exit',
+      click: () => { app.quit(); }
+    }
+  ])
+
+
+  tray.setContextMenu(contextMenu);
+}
+
+
+
+async function createWin(route, appStart) {
   //  get bounds or use default
   const winBounds = await getStorageItem(`winBounds_${route == '' ? 'console' : route}`, { width: 1500, height: 900 });
   const winMaxState = await getStorageItem(`winMaxState_${route == '' ? 'console' : route}`, false);
@@ -88,7 +122,7 @@ async function createWin(route) {
 
   //  show splash win
 
-  if (route == '') {
+  if (appStart) {
     splashWin.loadURL('http://localhost:5173/splash.html');
     splashWin.center();
 
@@ -108,7 +142,7 @@ async function createWin(route) {
       winMaxState && win.maximize();
       win.show();
       splashWin.close();
-    }, route == '' ? 750 : 50)
+    }, appStart ? 750 : 50)
   })
   
 
@@ -125,7 +159,8 @@ async function createWin(route) {
 
 
 app.on('ready', () => {
-  createWin('');
+  createWin('', true);
+  createTray();
   autoUpdate();
   runOnStartup();
 })

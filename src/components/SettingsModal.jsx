@@ -121,19 +121,27 @@ export function SettingsModal({ userData, setUserData }) {
         </div>
 
 
-        <div className="flex w-11/12 flex-col gap-3 overflow-auto">
+        <div className="flex w-11/12 justify-between items-center gap-3 mt-5">
           <p className="text-l">Run MultiCast on startup</p>
-          <input type="checkbox" checked={newRunOnStartup} onChange={() => setPreference('runOnStartup', !newRunOnStartup)} />
+          
+          <section className="slider-checkbox">
+            <input className="slider-input" type="checkbox" checked={newRunOnStartup} onChange={() => setPreference('runOnStartup', !newRunOnStartup)} id="c3" />
+            <label className="slider-label label" htmlFor="c3"></label>
+          </section>
         </div>
 
 
-        <div className="flex w-11/12 flex-col gap-3 overflow-auto">
+        <div className="flex w-11/12 justify-between items-center gap-3 mt-2 mb-5">
           <p className="text-l">Automatically update MultiCast</p>
-          <input type="checkbox" checked={newAutoUpdate} onChange={() => setPreference('autoUpdate', !newAutoUpdate)} />
+
+          <section className="slider-checkbox">
+            <input className="slider-input" type="checkbox" checked={newAutoUpdate} onChange={() => setPreference('autoUpdate', !newAutoUpdate)} id="c3" />
+            <label className="slider-label label" htmlFor="c3"></label>
+          </section>
         </div>
 
 
-        <div className="flex w-11/12 flex-col overflow-auto">
+        <div className="flex w-11/12 flex-col mb-5">
           <p className="text-l">Config:</p>
           <p className="text-sm text-text-shade">Your feed and output configuration.</p>
           
@@ -147,7 +155,7 @@ export function SettingsModal({ userData, setUserData }) {
 
           <div className='text-sm text-red-400'>{configInputError} <p className={`text-xs mt-2 p-2 bg-secondary/25 ${!configInputAdvErr && 'hidden'}`}>{configInputAdvErr}</p></div>
 
-          <div className="flex justify-end gap-5">
+          <div className="flex justify-end gap-5 my-1">
             <a className="bg-secondary hover:bg-secondary/80 cursor-pointer p-2 px-5" onClick={toggleModalHandler}>Cancel</a>
             <a className="bg-accent hover:bg-accent/80 cursor-pointer p-2 px-5" onClick={saveConfigChanges}>Save changes to config</a>
           </div>

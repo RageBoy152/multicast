@@ -23,6 +23,8 @@ export default function Console() {
 
 
   useEffect(() => {
+    document.title = 'console';
+    
     const syncState = (e) => {
       if (e.key === 'rage.multicast.config')
         setUserData(JSON.parse(e.newValue))
