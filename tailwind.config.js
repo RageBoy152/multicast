@@ -26,7 +26,7 @@ export default {
       base: '1.2rem',
       l: '1.3rem',
       xl: '1.5rem',
-      xxl: '2rem',
+      xxl: '2rem'
     }
   },
   plugins: [],

@@ -55,12 +55,41 @@ export function NotificationDropdown({ notifications, setUserData, forcedNotif }
     
     return () => {window.clearInterval(oldcheckInterval); window.clearInterval(refreshInterval)}
   }, [])
+
+  
+
+  //  Autoupdate status receivers for notifying user
+
+  window.electronAPI.receive('autoUpdate-ready', () => {
+    setUserData((currentUserData) => ({
+      ...currentUserData,
+      notifications: [{
+        "notificationId": crypto.randomUUID(),
+        "timestamp": new Date().toISOString(),
+        "title": "New MultiCast update available",
+        "body": `Update will install automatically on next launch or you can <a onclick="window.electronAPI.send('exit-app')" class='text-text-shade hover:text-text cursor-pointer underline'>restart now</a>`,
+        "status": "info"
+      }, ...currentUserData.notifications]
+    }))
+  })
+  window.electronAPI.receive('autoUpdate-error', (err) => {
+    setUserData((currentUserData) => ({
+      ...currentUserData,
+      notifications: [{
+        "notificationId": crypto.randomUUID(),
+        "timestamp": new Date().toISOString(),
+        "title": "Error during auto update",
+        "body": err,
+        "status": "danger"
+      }, ...currentUserData.notifications]
+    }))
+  })
   
   
 
   return (
-    <div id="notifications-container" className="bg-primary absolute top-[50px] mr-28 w-3/12 max-h-80 z-50 flex flex-col" style={{display: "none"}}>
-      <div className="flex flex-col py-1 px-3 border-b border-accent">
+    <div id="notifications-container" className="bg-primary absolute bottom-[50px] mr-28 w-3/12 max-h-80 z-50 flex flex-col-reverse" style={{display: "none"}}>
+      <div className="flex flex-col py-1 px-3 border-t border-accent">
         <p className='h-[25px]'>Notifications</p>
         <p className="text-xs text-text-shade">Deleted automatically after 24 hours.</p>
       </div>

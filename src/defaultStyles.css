@@ -106,3 +106,35 @@
 
 .volumeInput:hover::-webkit-slider-thumb { @apply bg-accent/60; }
 .volumeInput::-webkit-slider-thumb:hover { @apply bg-accent/90; }
+
+
+
+
+.drag { -webkit-app-region: drag; }
+.no-drag { -webkit-app-region: no-drag; }
+
+
+
+.loader {
+  width: 35px;
+  height: 35px;
+  border: 2px solid var(--color-text);
+  border-bottom-color: transparent;
+  border-radius: 50%;
+  display: inline-block;
+  box-sizing: border-box;
+  animation: rotation 1s linear infinite;
+}
+form .loader {
+  width: 15px;
+  height: 15px;
+}
+
+@keyframes rotation {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}

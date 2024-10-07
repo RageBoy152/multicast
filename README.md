@@ -17,7 +17,7 @@ Each output can have between 1 and 9 seperate feeds at once.
 
 ### App exclusive features
 
-Due to the lack of browser security restrictions, the Multicast app comes with additional features for a better user experience such as volume sliders on feed outputs aswell as audio level vizualisers.
+Due to the lack of browser security restrictions, the Multicast app comes with additional features for a better user experience such as volume sliders on feed outputs, audio level vizualisers and run on startup cababilities.
 
 
 ### Context Menu
@@ -27,7 +27,7 @@ In the context menu is buttons to edit, delete and copy credits. Credits will be
 
 
 ### Config editing
-You're configuration data is saved in the browsers local storage. You can view this data using the settings icon on the navigation bar.
+You're configuration data is saved in the apps local storage. You can view this data using the settings icon on the navigation bar.
 You can copy and paste other peoples configs but only manually edit values if you know what you're doing. There is very minimal input validation here.
 
 <!-- ### For developers

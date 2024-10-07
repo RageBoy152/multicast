@@ -125,7 +125,7 @@ export const forcedNotif = {
   "notificationId": "f0f326f4-f781-4407-a571-751670a76547",
   "timestamp": new Date().toISOString(),
   "title": "MultiCast V2.0 is live",
-  "body": "Read the release notes <a href='https://github.com/RageBoy152/multicast-web/releases/tag/2.0.0' target='_blank' class='text-text-shade hover:text-text underline'>here</a>",
+  "body": `Read the release notes <a onclick="window.electronAPI.send('openExternal', 'https://github.com/RageBoy152/multicast/releases/tag/2.0.0')" class='text-text-shade hover:text-text cursor-pointer underline'>here</a>`,
   "status": "info",
   "toasted": true
 }
@@ -137,7 +137,7 @@ function getData(initialValue) {
   let localStorageData = localStorage.getItem("rage.multicast.config");
 
   //  return local storage value or return initialValue or result of initialValue()
-  return localStorageData != null ? JSON.parse(localStorageData) : defaultConfig;
+  return localStorageData != null && JSON.parse(localStorageData).version ? JSON.parse(localStorageData) : defaultConfig;
 }
 
 

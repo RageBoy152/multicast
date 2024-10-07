@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+  <head>
+
+    <!--   META DATA   -->
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="./favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>MultiCast V2 Splash</title>
+
+
+    <!--   GOOGLE FONTS   -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&family=Quantico:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+
+
+    <!--   JQUERY   -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+
+    <link rel="stylesheet" href="./src/defaultStyles.css">
+    <style>
+      .container {
+        background: rgb(25,29,38);
+        background: linear-gradient(153deg, #262d3d 0%, #2f419c 70%, #364dc2 100%);
+        background-repeat: no-repeat;
+        background-size: 200% 200%;
+        background-position: 50% 0%;
+
+        width: 400px;
+        height: 600px;
+
+        transition: 0.3s ease-in-out background-position;
+      }
+
+      .container:hover {
+        background-position: 50% 50%;
+      }
+
+      h1 { font-size: 3rem; }
+    </style>
+  </head>
+
+  <body class="font-Orbitron text-text">
+    <div class="container flex flex-col items-center justify-center">
+      <div class="loader"></div>
+        <h1 class="select-none">
+          MultiCast
+          <span class="text-text-shade text-base h-min">V2.0</span>
+        </h1>
+    </div>
+  </body>
+</html>

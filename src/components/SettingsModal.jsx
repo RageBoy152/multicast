@@ -4,9 +4,43 @@ import { toggleModal } from '../utils/toggleModal';
 
 
 export function SettingsModal({ userData, setUserData }) {
+  //  input value states
   const [newConfig, setNewConfig] = useState(JSON.stringify(userData, null, 2));
+  const [newRunOnStartup, setNewRunOnStartup] = useState(false);
+  const [newAutoUpdate, setNewAutoUpdate] = useState(false);
+
+
+
+  //  Get preferences from main
+  useEffect(() => {
+    window.electronAPI.send('get-preference', 'autoUpdate');
+    window.electronAPI.send('get-preference', 'runOnStartup');
+
+    const handlePreferenceReply = (data) => {
+      if (data.key == 'autoUpdate') setNewAutoUpdate(data.preference);
+      else if (data.key == 'runOnStartup') setNewRunOnStartup(data.preference);
+    }
+
+    window.electronAPI.receive('get-preference-reply', handlePreferenceReply);
+
+    return () => { window.electronAPI.receive('get-preference-reply', handlePreferenceReply); }
+  }, [])
+
+
+  
+
+
+  function setPreference(key, newPreference) {
+    window.electronAPI.send('update-preference', { key: key, value: newPreference });
+  }
+
+
+
+  //  input invalid err states
   const [configInputError, setConfigInputError] = useState('');
   const [configInputAdvErr, setConfigInputAdvErr] = useState('');
+  
+  
   const [lockedTextarea, setLockedTextarea] = useState(true);
 
 
@@ -85,30 +119,42 @@ export function SettingsModal({ userData, setUserData }) {
           <h3 className="text-xl">Settings</h3>
           <a className="cursor-pointer text-text-shade hover:text-text" onClick={toggleModalHandler}><i className="bi bi-x-lg"></i></a>
         </div>
-        <div className="flex w-11/12 flex-col gap-3 py-4 overflow-auto">
-          <div className="flex flex-col">
-            <p className="text-l">Config:</p>
-            <p className="text-sm text-text-shade">Your feed and output configuration.</p>
-            
-            <div className='h-[300px] my-3 relative'>
-              <textarea className='bg-secondary text-xs px-2 py-1 resize-none w-full h-full' readOnly={lockedTextarea} value={newConfig} onChange={(e) => setNewConfig(e.target.value)}></textarea>
-              <div className="absolute top-3 end-3 gap-3 flex">
-                <a onClick={copyConfig} className='bg-primary hover:bg-primary/80 rounded cursor-pointer aspect-square w-[30px] flex items-center justify-center'><i className="bi bi-clipboard"></i></a>
-                <a onClick={toggleLockedTextarea} className='bg-primary hover:bg-primary/80 rounded cursor-pointer aspect-square w-[30px] flex items-center justify-center'><i className={`bi ${lockedTextarea ? 'bi-lock' : 'bi-unlock'}`}></i></a>
-              </div>
-            </div>
 
-            <div className='text-sm text-red-400'>{configInputError} <p className={`text-xs mt-2 p-2 bg-secondary/25 ${!configInputAdvErr && 'hidden'}`}>{configInputAdvErr}</p></div>
-          </div>
+
+        <div className="flex w-11/12 flex-col gap-3 overflow-auto">
+          <p className="text-l">Run MultiCast on startup</p>
+          <input type="checkbox" checked={newRunOnStartup} onChange={() => setPreference('runOnStartup', !newRunOnStartup)} />
         </div>
-        <div className="border-t border-accent flex flex-col gap-3 w-full py-3 px-3">
+
+
+        <div className="flex w-11/12 flex-col gap-3 overflow-auto">
+          <p className="text-l">Automatically update MultiCast</p>
+          <input type="checkbox" checked={newAutoUpdate} onChange={() => setPreference('autoUpdate', !newAutoUpdate)} />
+        </div>
+
+
+        <div className="flex w-11/12 flex-col overflow-auto">
+          <p className="text-l">Config:</p>
+          <p className="text-sm text-text-shade">Your feed and output configuration.</p>
+          
+          <div className='h-[300px] my-3 relative'>
+            <textarea className='bg-secondary text-xs px-2 py-1 resize-none w-full h-full' readOnly={lockedTextarea} value={newConfig} onChange={(e) => setNewConfig(e.target.value)}></textarea>
+            <div className="absolute top-3 end-3 gap-3 flex">
+              <a onClick={copyConfig} className='bg-primary hover:bg-primary/80 rounded cursor-pointer aspect-square w-[30px] flex items-center justify-center'><i className="bi bi-clipboard"></i></a>
+              <a onClick={toggleLockedTextarea} className='bg-primary hover:bg-primary/80 rounded cursor-pointer aspect-square w-[30px] flex items-center justify-center'><i className={`bi ${lockedTextarea ? 'bi-lock' : 'bi-unlock'}`}></i></a>
+            </div>
+          </div>
+
+          <div className='text-sm text-red-400'>{configInputError} <p className={`text-xs mt-2 p-2 bg-secondary/25 ${!configInputAdvErr && 'hidden'}`}>{configInputAdvErr}</p></div>
+
           <div className="flex justify-end gap-5">
             <a className="bg-secondary hover:bg-secondary/80 cursor-pointer p-2 px-5" onClick={toggleModalHandler}>Cancel</a>
             <a className="bg-accent hover:bg-accent/80 cursor-pointer p-2 px-5" onClick={saveConfigChanges}>Save changes to config</a>
           </div>
-          <p className='text-xs text-red-400 text-end font-bold'>Warning: please do not manually edit your config unless you know what you're doing.</p>
+          <p className='text-xs text-red-400 text-end font-bold mt-2'>Warning: please do not manually edit your config unless you know what you're doing.</p>
         </div>
         
+
       </div>
     </div>
   )

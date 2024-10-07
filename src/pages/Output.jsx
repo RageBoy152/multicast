@@ -6,6 +6,7 @@ import useUserData, { forcedNotif } from '../hooks/useUserData';
 //  React Compontents
 import { OutputCardPreview } from "../components/OutputCardPreview";
 import { NotificationToastList } from "../components/NotificationToastList";
+import { AppNavBar } from "../components/AppNavBar";
 
 
 
@@ -34,6 +35,7 @@ export default function Output() {
 
   return (
     <>
+      <AppNavBar />
       <NotificationToastList setUserData={setUserData} notifications={userData.notifications} />
       <OutputCardPreview outputFeeds={outputObj.feeds} {...outputObj} inOutput={true} setUserData={setUserData} userData={userData} />
     </>
