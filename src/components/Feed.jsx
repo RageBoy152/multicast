@@ -35,6 +35,12 @@ export function Feed({ outputName, feedId, videoId, volume, basisClass = '', hei
   function setVol(e) {
     setNewVolume(e.target.value)
 
+    $(`#${feedId}`)[0].executeJavaScript(`
+      for (let i=0; i<5; i++) {
+        window.setGainValue(${calcGainFromVolPercent(e.target.value)}, audioCtx.currentTime, 0.01);
+      }
+    `)
+
     setUserData((currentData) => ({
       ...currentData,
       outputs: [
@@ -46,21 +52,125 @@ export function Feed({ outputName, feedId, videoId, volume, basisClass = '', hei
   }
 
   
+  useEffect(() => {
+    const webview = $(`#${feedId}`)[0];
+    if (!webview) return;
+
+
+
+    webview.addEventListener('did-finish-load', () => {
+      // webview.openDevTools();
+
+
+      webview.addEventListener('console-message', (e) => {
+        if (!e.message.includes('AUDIO-DB_')) return;
+
+        const dB = parseInt(e.message.split('AUDIO-DB_')[1]);
+
+        const minDB = -60;
+        const maxDB = 12;
+
+        const normalizedDB = Math.max(0, Math.min(100, (((dB - minDB) / (maxDB - minDB)) * 100)));
+
+        const meterValue = isNaN(normalizedDB) ? 100 : (100 - (normalizedDB)) * 0.8;
+
+        $(`#volInput_${feedId}`).css({'--clip-top': `${meterValue}%`});
+      })
+
+
+      webview.executeJavaScript(`
+        //  remove volume slider from ytp
+
+        let volAreaElem = document.querySelector('.ytp-volume-area');
+        volAreaElem && volAreaElem.remove();
+
+
+
+        //  init audio context
+
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)({
+          latencyHint: 'interactive'
+        });
+        const video = document.querySelector('video');
+        const source = audioCtx.createMediaElementSource(video);
+
+
+
+        //  add gain node
+
+        const gainNode = audioCtx.createGain();
+
+        source.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+
+        gainNode.gain.value = ${calcGainFromVolPercent(newVolume)};
+        window.setGainValue = (value) => { gainNode.gain.value = value; }
+
+
+
+        //  audio analysis node
+
+        const analyser = audioCtx.createAnalyser();
+
+        gainNode.connect(analyser);
+        analyser.connect(audioCtx.destination);
+
+        analyser.fftSize = 256/4;
+        const bufferLength = analyser.frequencyBinCount;
+        const dataArray = new Uint8Array(bufferLength);
+
+        function getAverageVolume(array) {
+          let values = 0;
+          let average;
+          for (let i = 0; i < array.length; i++) {
+            values += array[i];
+          }
+          average = values / array.length;
+          return average;
+        }
+
+
+
+        //  send back db
+
+        function logAudioLevel() {
+          analyser.getByteFrequencyData(dataArray);
+          const average = getAverageVolume(dataArray);
+          const dB = 20 * Math.log10(average / 255);
+          console.log('AUDIO-DB_'+dB.toString());
+        }
+
+        setInterval(logAudioLevel, 100);
+      `, true)
+    })
+
+
+    return () => {
+      webview.addEventListener('did-finish-load', () => {});
+    }
+  }, [])
+
+
+  function calcGainFromVolPercent(volume) {
+    let gainValue = volume / 100;
+    
+    return gainValue < 0.01 ? 0 : gainValue;
+  }
+
 
   return (
     <div className={`${feedCardContextClassStyles} relative flex items-center ${basisClass} ${heightClass}`}>
-      <div className="bg-primary flex flex-col items-center h-full px-2">
-        {/* <p className="text-xs h-[10%] flex items-center">{newVolume}%</p> */}
-        {/* <input className="volumeInput h-[65%]" type="range" min={0} max={100} value={newVolume} onChange={setVol} /> */}
+      <div className="bg-primary flex flex-col items-center h-full w-[45px]">
+        <p className="text-xs h-[10%] flex items-center">{newVolume}%</p>
+        <input id={`volInput_${feedId}`} className="volumeInput h-[65%]" type="range" min={0} max={100} value={newVolume} onChange={setVol} />
 
-        {/*    FOR APP VERSION - MAKE THIS HEIGHT H-25%    */}
-        <div className="h-[100%] flex flex-col justify-center gap-3">
+        <div className="h-[25%] flex flex-col justify-center gap-3">
           <a onClick={() => copyCredits(userData, setUserData, outputName, feedId)} className="bg-accent hover:bg-accent/80 cursor-pointer h-[30px] w-[30px] rounded flex items-center justify-center"><i className="bi bi-clipboard"></i></a>
           <a href={`https://www.youtube.com/live_chat?is_popout=1&v=${videoId}`} target='_blank' className="bg-accent hover:bg-accent/80 cursor-pointer h-[30px] w-[30px] rounded flex items-center justify-center"><i className="bi bi-chat-left-text"></i></a>
         </div>
       </div>
       <div className="bg-accent w-full h-full">
-        <ReactPlayer url={`https://youtube.com/embed/${videoId}?autoplay=1`} playing={true} controls={true} width={"100%"} height={"100%"} />
+        <webview id={feedId} src={`https://youtube.com/embed/${videoId}?autoplay=1`} className='h-full' />
       </div>
     </div>
   )

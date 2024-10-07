@@ -7,12 +7,12 @@ import './defaultStyles.css'
 
 
 createRoot(document.getElementById('root')).render(
-  <StrictMode>
+  // <StrictMode>
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Console />}></Route>
         <Route path="/output" element={<Output />}></Route>
       </Routes>
     </BrowserRouter>
-  </StrictMode>
+  // </StrictMode>
 )
