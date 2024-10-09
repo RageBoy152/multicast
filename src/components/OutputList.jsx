@@ -8,7 +8,7 @@ export function OutputList({ outputsData, setUserData }) {
         <div className="text-xxl flex items-center justify-between">
           <h1>Outputs</h1>
           <p className="text-xs">
-            MultiCast V2.0 | Developed by <a onClick={() => window.electronAPI.send('openExternal', 'https://discord.com/users/693191740961718420')} className="text-text-shade hover:text-text cursor-pointer underline">Rage</a>
+            MultiCast V2.0.1 | Developed by <a onClick={() => window.electronAPI.send('openExternal', 'https://discord.com/users/693191740961718420')} className="text-text-shade hover:text-text cursor-pointer underline">Rage</a>
           </p>
         </div>
       </div>
