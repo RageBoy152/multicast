@@ -1,0 +1,83 @@
+.windowMenuBar {position:fixed;top:0;width:100%;z-index: 3;height:33px}
+
+
+
+
+/*    INPUTS    */
+input, select {
+    border:0;
+    outline: 0;
+    padding:1em!important;
+    background-color: rgba(var(--bs-secondary-rgb),1);
+    color: var(--bs-body-color);
+    border-radius: var(--round-radius);
+}
+
+
+
+
+/*   FEED CARDS CONTAINER   */
+main {width:90%;margin-inline:auto!important;overflow:hidden;padding-bottom:7em!important;height:100%;}
+.feedCards {margin-top:50px!important;overflow-x: scroll;width:100%;}
+
+
+/*   FEED CARD   */
+
+
+
+/* feed div */
+.feedCard {cursor: grab;flex-shrink:0;width:300px;aspect-ratio: 1.78;position:relative;}
+.feedCard.addFeed {border: 1px solid var(--bs-body-color);cursor: unset;}
+.feedCard:not(.addFeed):active {cursor: grabbing;}
+
+
+/* feed title bar */
+.feedCard h4 {font-size:1.2em;display:flex;justify-content:center;align-items:center;}
+.feedCard .feedTitle a:hover {color: rgba(var(--bs-danger-rgb), 1)!important}
+
+
+/* feed card in output */
+.output .feedCard .feedTitle {
+    position: absolute;
+    top:0;
+    width:100%;
+    
+    background-color: rgba(21, 22, 27,0.9)!important;
+    
+    transform-origin: top;
+    transform: scaleY(0);
+    transition:0.15s ease-in-out transform;
+}
+.output .feedCard:hover .feedTitle {transform: scaleY(1);}
+
+
+/* feed thumbnail */
+.feedPreview {
+    aspect-ratio: 1.78;
+    background-color: rgba(var(--bs-accent-rgb),1);
+}
+
+.feedCard img {width:100%;aspect-ratio: 1.78;}
+
+
+
+
+
+.outputContainer {
+    padding:0!important;
+}
+
+.outputs {width:100%;gap:1em;flex-wrap:wrap;}
+.outputWrapper {width:500px;aspect-ratio: 1.78;height:100%}
+
+
+.output .feedCard {width:100%;}
+
+
+.outputContainer.grid-2h2 .feedPreview, .outputContainer.grid-2h2 img, .outputContainer.grid-2h2 .feedCard {aspect-ratio: unset; height:100%}
+.outputContainer.grid-1 .feedPreview, .outputContainer.grid-1 img, .outputContainer.grid-1 .feedCard {aspect-ratio: unset; height:100%}
+
+
+#feedContextMenu {top:400px;left:300px;z-index:3;display:none;}
+
+#syncButton {bottom:7em;right:7em;display:none;}

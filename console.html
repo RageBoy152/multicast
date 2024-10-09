@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!--    META    -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Console</title>
+
+
+    <!--    CSS    -->
+    <link rel="stylesheet" href="styles/defaultStyles.css">
+    <link rel="stylesheet" href="styles/output.css">
+    <link rel="stylesheet" href="styles/multiview.css">
+
+
+    <!--    FONTS    -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+
+    <!--    BOOTSTRAP CSS    -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
+    <!--    JQUERY    -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+</head>
+<body>
+
+
+    <!--   WINDOW HEADING BAR   -->
+
+    <div id="window-menu-bar" class="windowMenuBar bg-primary drag flex-center px-1 w-100"></div>
+
+
+    <div class="modal fade" id="addFeedModal">
+        <div class="modal-dialog mx-auto my-5">
+            <div class="modal-content p-1">
+                <div class="modal-header p-3">
+                    <h1 class="modal-title fs-5">Add Feed</h1>
+                    <a class="whiteLink ms-auto fs-4" data-bs-dismiss="modal"><i class="bi bi-x-lg"></i></a>
+                </div>
+                <div class="modal-body p-4 d-flex flex-column">
+                    <div>
+                        <h5>Name:</h5>
+                        <input id="addFeedName" type="text" placeholder="name" class="w-100 mt-1">
+                    </div>
+                    
+                    <div class="mt-4">
+                        <h5>Source:</h5>
+                        <input id="addFeedSource" type="text" placeholder="https://youtube.com/watch?v=mhJRzQsLZGg" class="w-100 mt-1">
+                    </div>
+                </div>
+                <div class="modal-footer p-3 d-flex gap-3">
+                    <a class="button bg-secondary w-25 ms-auto" data-bs-dismiss="modal">Cancel</a>
+                    <a class="button w-25" onclick="addFeed()">Add Feed</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="syncButton" class="flex-center position-fixed">
+        <a class="button square fs-5" onclick="refreshOutputs()"><i class="bi bi-arrow-repeat"></i></a>
+    </div>
+
+    <div id="feedContextMenu" class="flex-column position-absolute bg-primary rounded-3 p-1" data-feedid="">
+        <a onclick="copyCredits(this.parentElement.dataset)" class="whiteLink p-2 bg-hover-tertiary rounded-3"><i class="bi bi-clipboard me-1"></i> Credits</a>
+        <a onclick="showEditFeedModal(this.parentElement.dataset)" class="whiteLink p-2 bg-hover-tertiary rounded-3"><i class="bi bi-pencil me-1"></i> Edit Feed</a>
+        <a onclick="addFeed(this.parentElement.dataset, true, false)" class="whiteLink p-2 bg-hover-tertiary rounded-3 danger-text-hover"><i class="bi bi-trash me-1"></i> Delete Feed</a>
+    </div>
+
+
+
+    <!--   MAIN WINDOW CONTENT   -->
+
+    <main class="d-flex flex-column align-items-center">
+        <div class="feedCards d-flex gap-4 pb-3">
+            <div class="feedCard output border flex-center" draggable="true">
+                <h5>Loading...</h5>
+            </div>
+        </div>
+
+        <div class="outputs d-flex justify-content-center mt-5 h-100">
+
+        </div>
+    </main>
+
+
+
+    <!--   NOTIFICATION TOASTS   -->
+
+    <div class="toast-container position-fixed bottom-0 end-0 pe-3 flex-column d-flex gap-2"></div>
+
+
+
+    <!--   FOOTER   -->
+
+    <footer class="p-3 bg-primary">
+        <div class="footer-wrapper d-flex align-items-center justify-content-between">
+            <div class="col">
+                <a class="whiteLink" onclick="openWindow('settings.html')"><i class="bi bi-gear"></i> Settings</a>
+            </div>
+            <div class="col text-end">
+                <p>MultiCast V1.3.2 | Developed by <a class="whiteLink" onclick="openExternalURL('https://discordapp.com/users/693191740961718420')">Rage</a></p>
+            </div>
+        </div>
+    </footer>
+
+
+
+    <!--    SCRIPTS    -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+
+    <script src="scripts/script.js"></script>
+
+
+    <script src="scripts/menu.js"></script>
+    <script src="scripts/newConsole.js"></script>
+</body>
+</html>

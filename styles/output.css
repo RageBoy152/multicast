@@ -1,0 +1,83 @@
+.outputContainer {
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+    /* aspect-ratio: 1.78; */
+}
+.outputContainer > .output {
+    flex-grow: 1;
+    flex-basis: 50%;
+    border: 1px solid rgba(var(--bs-primary-rgb),1);
+}
+
+
+.outputContainer.grid-1 > .output {height:100%;}
+.outputContainer.grid-2 > .output {height:50%;}
+.outputContainer.grid-2h2 > .output {height:50%;flex-basis:33.333%;}
+.outputContainer.grid-3 > .output {flex-basis:33.333%;height:33.333%;}
+
+
+.outputContainer iframe, .outputContainer webview {width:100%;height:100%;}
+
+
+
+
+/*  audio input container  */
+.audioControl { height: 100% }
+
+.audioControl .button.square {width:30px;height:30px;font-size:0.8em;}
+
+.audioControl p { font-size:0.6em; }
+
+
+/*  volume input element  */
+input[type="range"] { appearance:none; background:transparent; height:100%; writing-mode: vertical-lr; padding:1em 1em!important; transform: scaleY(-1); }
+
+
+/*  volume input track  */
+.audioControl input::-webkit-slider-runnable-track {
+    width:7px;
+    background-color: rgba(var(--bs-tertiary-rgb),0.4);
+
+    position: relative;
+}
+
+/*  volume meter indicator  */
+
+.audioControl input::before {
+    content: '';
+    position: absolute;
+
+    top:0; left:0;
+    width:7px; height:calc(100% - 2em);
+
+    margin-inline:1em;
+    margin-left:16px;
+    
+    background: linear-gradient(180deg, rgba(25,194,41,1) 42%, rgba(199,210,7,1) 60%, rgba(187,5,5,1) 85%);
+    
+    /*  cut off top of grad  */
+    clip-path: inset(0 0 var(--clip-top, 100%) 0);
+    transition: 0.15s ease-in-out clip-path;
+}
+
+
+
+/*  volume input thumb  */
+
+.audioControl input::-webkit-slider-thumb {
+    appearance:none;
+    cursor:pointer;
+
+    background:rgba(var(--bs-accent-rgb),0.4);
+
+    height:28px;
+    width:20px;
+
+    margin-block:-7px;
+    
+    border:1px solid rgba(var(--bs-accent-rgb),1);
+}
+
+.audioControl:hover input::-webkit-slider-thumb { background:rgba(var(--bs-accent-rgb),0.7); }
+.audioControl input::-webkit-slider-thumb:hover { background:rgba(var(--bs-accent-rgb),0.9); }

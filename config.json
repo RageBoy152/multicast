@@ -1,0 +1,43 @@
+{
+    "feedList": [
+        {
+            "feedId": "06471f6d-693c-46ab-98b9-24330c39b24b",
+            "feedName": "LP Rover 2",
+            "videoId": "tS2PHJmvJzo",
+            "volume": 20
+        }
+    ],
+    "outputs": [
+        {
+            "outputName": "Output 1",
+            "feedCount": 5,
+            "feeds": [
+                {},
+                {},
+                {},
+                {
+                    "feedId": "87f9855f-0c78-40a6-8159-b1799bc55ab2",
+                    "feedName": "NSF SBL",
+                    "videoId": "mhJRzQsLZGg",
+                    "volume": 50
+                },
+                {}
+            ]
+        },
+        {
+            "outputName": "Output 2",
+            "feedCount": 2,
+            "feeds": [
+                {},
+                {}
+            ]
+        },
+        {
+            "outputName": "Output 3",
+            "feedCount": 1,
+            "feeds": [
+                {}
+            ]
+        }
+    ]
+}
