@@ -1,7 +1,8 @@
-# MultiCast - [Download](https://github.com/RageBoy152/multicast/releases/latest)
+# MultiCast - [Download](https://multicast.watch/download)
 
-MultiCast V2.0 is currnetly work in progress.
-For now, you can use the [web version of MultiCast](https://multicast.watch) until the application version is ready.
+MultiCast has received a major overhaul.
+Along with the application, there is also a [web version of MultiCast](https://multicast.watch).
+
 
 # How to Use
 
@@ -30,8 +31,6 @@ In the context menu is buttons to edit, delete and copy credits. Credits will be
 You're configuration data is saved in the apps local storage. You can view this data using the settings icon on the navigation bar.
 You can copy and paste other peoples configs but only manually edit values if you know what you're doing. There is very minimal input validation here.
 
-<!-- ### For developers
-If you wish to host this project locally, use `npm i` to install all the dependancies, then run `npm run dev` to open the dev version and `npm run build` to build which you can view by using `npx serve dist`. -->
 
 # Technologies Used
 - [React JS](https://react.dev)
