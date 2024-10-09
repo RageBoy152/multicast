@@ -124,13 +124,13 @@ const defaultConfig = {
 export const forcedNotif = {
   "notificationId": "forced-2024-10-09T134600Z",
   "timestamp": new Date().toISOString(),
-  "title": "MultiCast V2.0 is live",
-  "body": `Read the release notes <a onclick="window.electronAPI.send('openExternal', 'https://github.com/RageBoy152/multicast/releases/tag/2.0.0')" class='text-text-shade hover:text-text cursor-pointer underline'>here</a>`,
+  "title": "MultiCast V2.0.1 is live",
+  "body": `Read the release notes <a onclick="window.electronAPI.send('openExternal', 'https://github.com/RageBoy152/multicast/releases/tag/2.0.1')" class='text-text-shade hover:text-text cursor-pointer underline'>here</a>`,
   "status": "info",
   "toasted": true
 }
 
-const version = "2.0";
+const version = "2.0.1";
 
 
 function getData() {
