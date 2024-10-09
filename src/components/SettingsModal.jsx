@@ -8,6 +8,7 @@ export function SettingsModal({ userData, setUserData }) {
   const [newConfig, setNewConfig] = useState(JSON.stringify(userData, null, 2));
   const [newRunOnStartup, setNewRunOnStartup] = useState(false);
   const [newAutoUpdate, setNewAutoUpdate] = useState(false);
+  const [newFeedFuncBarMode, setNewFeedFuncBarMode] = useState('always');
 
 
 
@@ -15,10 +16,12 @@ export function SettingsModal({ userData, setUserData }) {
   useEffect(() => {
     window.electronAPI.send('get-preference', 'autoUpdate');
     window.electronAPI.send('get-preference', 'runOnStartup');
+    window.electronAPI.send('get-preference', 'feedFunBarMode');
 
     const handlePreferenceReply = (data) => {
       if (data.key == 'autoUpdate') setNewAutoUpdate(data.preference);
       else if (data.key == 'runOnStartup') setNewRunOnStartup(data.preference);
+      else if (data.key == 'feedFunBarMode') setNewFeedFuncBarMode(data.preference);
     }
 
     window.electronAPI.receive('get-preference-reply', handlePreferenceReply);
@@ -137,6 +140,19 @@ export function SettingsModal({ userData, setUserData }) {
           <section className="slider-checkbox">
             <input className="slider-input" type="checkbox" checked={newAutoUpdate} onChange={() => setPreference('autoUpdate', !newAutoUpdate)} id="c3" />
             <label className="slider-label label" htmlFor="c3"></label>
+          </section>
+        </div>
+
+
+        <div className="flex w-11/12 justify-between items-center gap-3 mt-2 mb-5">
+          <p className="text-l">Feed sidebar visibility</p>
+
+          <section className="slider-checkbox">
+            <select className='bg-secondary px-2 py-1' value={newFeedFuncBarMode} onChange={(e) => setPreference('feedFunBarMode', e.target.value)}>
+              <option value="hover">Visible on hover</option>
+              <option value="always">Always visible</option>
+            </select>
+            {/* <input className="slider-input" type="checkbox" onChange={(e) => setPreference('feedFunBarMode', e.target.value)} id="c3" /> */}
           </section>
         </div>
 

@@ -30,6 +30,9 @@ export function Feed({ outputName, feedId, videoId, volume, basisClass = '', hei
   let feedCardContextClassStyles = basisClass == '' ? 'w-9/12' : 'flex-grow';
 
   const [newVolume, setNewVolume] = useState(volume);
+  const [feedFuncsHidden, setFeedFuncsHidden] = useState(false);
+
+  const [feedFuncBarMode, setFeedFuncBarMode] = useState(true);
 
 
   function setVol(e) {
@@ -53,6 +56,20 @@ export function Feed({ outputName, feedId, videoId, volume, basisClass = '', hei
 
   
   useEffect(() => {
+    //  Get preferences from main
+    window.electronAPI.send('get-preference', 'feedFunBarMode');
+
+    const handlePreferenceReply = (data) => {
+      if (data.key == 'feedFunBarMode') { setFeedFuncBarMode(data.preference); setFeedFuncsHidden(data.preference == 'hover' ? true : false) }
+    }
+
+    window.electronAPI.receive('get-preference-reply', handlePreferenceReply);
+
+
+
+
+    //  webveiw stuff
+
     const webview = $(`#${feedId}`)[0];
     if (!webview) return;
 
@@ -145,8 +162,10 @@ export function Feed({ outputName, feedId, videoId, volume, basisClass = '', hei
     })
 
 
+
     return () => {
       webview.addEventListener('did-finish-load', () => {});
+      window.electronAPI.receive('get-preference-reply', handlePreferenceReply);
     }
   }, [])
 
@@ -158,18 +177,24 @@ export function Feed({ outputName, feedId, videoId, volume, basisClass = '', hei
   }
 
 
-  return (
-    <div className={`${feedCardContextClassStyles} relative flex items-center ${basisClass} ${heightClass}`}>
-      <div className="bg-primary flex flex-col items-center h-full w-[45px]">
-        <p className="text-xs h-[10%] flex items-center">{newVolume}%</p>
-        <input id={`volInput_${feedId}`} className="volumeInput h-[65%]" type="range" min={0} max={100} value={newVolume} onChange={setVol} />
 
-        <div className="h-[25%] flex flex-col justify-center gap-3">
-          <a onClick={() => copyCredits(userData, setUserData, outputName, feedId)} className="bg-accent hover:bg-accent/80 cursor-pointer h-[30px] w-[30px] rounded flex items-center justify-center"><i className="bi bi-clipboard"></i></a>
-          <a href={`https://www.youtube.com/live_chat?is_popout=1&v=${videoId}`} target='_blank' className="bg-accent hover:bg-accent/80 cursor-pointer h-[30px] w-[30px] rounded flex items-center justify-center"><i className="bi bi-chat-left-text"></i></a>
-        </div>
+  return (
+    <div className={`${feedCardContextClassStyles} relative flex items-center ${basisClass} ${heightClass}`} onMouseOver={() => feedFuncBarMode == 'hover' && setFeedFuncsHidden(false)} onMouseLeave={() => feedFuncBarMode == 'hover' && setFeedFuncsHidden(true)}>
+      <div className={`bg-primary flex flex-col items-center h-full transition-all duration-150 ease-linear ${feedFuncsHidden ? 'w-0' : 'w-[45px] px-2'}`}>
+        {!feedFuncsHidden && (
+          <>
+            <p className="text-xs h-[10%] flex items-center">{newVolume}%</p>
+            <input id={`volInput_${feedId}`} className="volumeInput h-[65%]" type="range" min={0} max={100} value={newVolume} onChange={setVol} />
+
+            <div className="h-[25%] flex flex-col justify-center gap-3">
+              <a onClick={() => copyCredits(userData, setUserData, outputName, feedId)} className="bg-accent hover:bg-accent/80 cursor-pointer h-[30px] w-[30px] rounded flex items-center justify-center"><i className="bi bi-clipboard"></i></a>
+              <a href={`https://www.youtube.com/live_chat?is_popout=1&v=${videoId}`} target='_blank' className="bg-accent hover:bg-accent/80 cursor-pointer h-[30px] w-[30px] rounded flex items-center justify-center"><i className="bi bi-chat-left-text"></i></a>
+            </div>
+          </> 
+        )}
+        
       </div>
-      <div className="bg-accent w-full h-full">
+      <div className={`bg-accent transition-all duration-150 ease-linear ${feedFuncsHidden ? 'w-full' : 'w-[calc(100%-45px)]'} h-full`}>
         <webview id={feedId} src={`https://youtube.com/embed/${videoId}?autoplay=1`} className='h-full' />
       </div>
     </div>

@@ -11,7 +11,7 @@ import { AppNavBar } from "../components/AppNavBar";
 
 
 export default function Output() {
-  const [userData, setUserData] = useUserData({});
+  const [userData, setUserData] = useUserData();
 
   useEffect(() => {
     const syncState = (e) => {
@@ -30,8 +30,11 @@ export default function Output() {
   console.log(userData)
 
 
-  let outputId = new URL(window.location).searchParams.get('outputId');
+  // let outputId = new URL(window.location).searchParams.get('outputId');
+  let outputId = window.location.hash.split('/output?outputId=')[1];
   let outputObj = userData.outputs.find(outputObj => outputObj.outputId == outputId)
+
+
 
   return (
     <>

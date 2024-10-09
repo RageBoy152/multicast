@@ -18,7 +18,7 @@ import { AppNavBar } from "../components/AppNavBar";
 
 
 export default function Console() {
-  const [userData, setUserData] = useUserData({});
+  const [userData, setUserData] = useUserData();
   const [editFeedObj, setEditFeedObj] = useState({});
 
 

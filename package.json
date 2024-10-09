@@ -1,6 +1,8 @@
 {
   "name": "multicast",
-  "productName": "multicast",
+  "productName": "MultiCast",
+  "author": "Rage",
+  "description": "MultiCast - View all the Starbase, Texas live streams in one place.",
   "private": true,
   "version": "2.0.0",
   "main": "main.js",
@@ -10,9 +12,10 @@
     "vite-build": "vite build",
     "lint": "eslint .",
     "vite-preview": "vite preview",
-    "electron-serve": "concurrently -k \"cross-env BROWSER=none yarn start\" \"yarn electron:start\"",
-    "electron-build": "node build.js",
-    "electron-start": "wait-on tcp:5173 && electron ."
+    "electron-serve": "concurrently -k \"cross-env BROWSER=none yarn vite-dev\" \"yarn electron-start\"",
+    "electron-build": "node build-script-rage.js",
+    "electron-start": "wait-on tcp:5173 && electron .",
+    "electron-preview": "electron ."
   },
   "repository": "https://github.com/RageBoy152/multicast",
   "pulbish": {
@@ -23,7 +26,26 @@
     "appId": "com.Rage.MultiCast",
     "win": {
       "target": "nsis",
-      "icon": "./multiCastIcon-256.png"
+      "icon": "multiCastIcon-256.png"
+    },
+    "files": [
+      "dist/**/*",
+      "main.js",
+      "preload.js",
+      "node_modules/**/*",
+      "package.json",
+      "favicon.png",
+      "!**/*.env",
+      "!build-script-rage.js"
+    ],
+    "nsis": {
+      "license": "license",
+      "oneClick": "false",
+      "allowToChangeInstallationDirectory": "true"
+    },
+    "directories": {
+      "output": "releases",
+      "buildResources": "dist"
     }
   },
   "dependencies": {
@@ -31,11 +53,9 @@
     "concurrently": "^9.0.1",
     "cross-env": "^7.0.3",
     "dotenv": "^16.4.5",
-    "electron": "^32.1.2",
-    "electron-builder": "^25.1.7",
     "electron-log": "^5.2.0",
     "electron-store": "^10.0.0",
-    "electron-updater": "^6.3.9",
+    "electron-updater": "^6.2.1",
     "nodemailer": "^6.9.15",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
@@ -49,6 +69,8 @@
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react-swc": "^3.5.0",
     "autoprefixer": "^10.4.20",
+    "electron": "^32.1.2",
+    "electron-builder": "^25.0.0-alpha.9",
     "eslint": "^9.9.0",
     "eslint-plugin-react": "^7.35.0",
     "eslint-plugin-react-hooks": "^5.1.0-rc.0",

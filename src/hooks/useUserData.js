@@ -116,13 +116,13 @@ const defaultConfig = {
     }
   ],
   "notifications": [],
-  "version": "2.0"
+  "version": "1.3.4"
 }
 
 
 
 export const forcedNotif = {
-  "notificationId": "f0f326f4-f781-4407-a571-751670a76547",
+  "notificationId": "forced-2024-10-09T134600Z",
   "timestamp": new Date().toISOString(),
   "title": "MultiCast V2.0 is live",
   "body": `Read the release notes <a onclick="window.electronAPI.send('openExternal', 'https://github.com/RageBoy152/multicast/releases/tag/2.0.0')" class='text-text-shade hover:text-text cursor-pointer underline'>here</a>`,
@@ -133,16 +133,22 @@ export const forcedNotif = {
 const version = "2.0";
 
 
-function getData(initialValue) {
+function getData() {
   let localStorageData = localStorage.getItem("rage.multicast.config");
 
   //  return local storage value or return initialValue or result of initialValue()
-  return localStorageData != null && JSON.parse(localStorageData).version ? JSON.parse(localStorageData) : defaultConfig;
+  if (localStorageData != null && JSON.parse(localStorageData).version) {
+    return JSON.parse(localStorageData);
+  }
+  else {
+    localStorage.setItem("rage.multicast.config", JSON.stringify(defaultConfig));
+    return defaultConfig;
+  }
 }
 
 
-export default function useUserData(initialValue) {
-  const [userData, setUserData] = useState(getData(initialValue));
+export default function useUserData() {
+  const [userData, setUserData] = useState(getData());
 
 
   //  save to local storage on update
@@ -150,14 +156,9 @@ export default function useUserData(initialValue) {
     if (userData.version != version) {
       setUserData((currentUserData) => ({
         ...currentUserData,
+        notifications: [forcedNotif, ...currentUserData.notifications],
         forcedNotifDismissed: false,
         version: version
-      }))
-    }
-    if (!userData.notifications.find(notiObj => notiObj.notificationId == forcedNotif.notificationId) && !userData.forcedNotifDismissed) {
-      setUserData((currentUserData) => ({
-        ...currentUserData,
-        notifications: [forcedNotif, ...currentUserData.notifications]
       }))
     }
 

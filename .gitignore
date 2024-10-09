@@ -2,4 +2,5 @@ dist
 node_modules
 .vite
 .env
-build.js
+build-script-rage.js
+releases

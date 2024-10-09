@@ -2,17 +2,30 @@ const { app, BrowserWindow, ipcMain, shell, Tray, Menu } = require('electron');
 
 const nodemailer = require('nodemailer');
 const path = require('path');
-require('dotenv').config();
+
+if (process.env.NODE_ENV !== 'production')
+  require('dotenv').config();
 
 const exePathFull = path.resolve(path.dirname(process.execPath), 'Multi Cast.exe')
-
-const { autoUpdater, AppUpdater } = require('electron-updater');
-autoUpdater.autoDownload = false;
-autoUpdater.autoInstallOnAppQuit = true;
 
 
 const log = require('electron-log');
 log.transports.file.resolvePathFn = () => path.join(app.getPath('userData'), 'logs', 'main.log');
+
+
+
+const { autoUpdater } = require('electron-updater');
+autoUpdater.autoDownload = false;
+autoUpdater.autoInstallOnAppQuit = true;
+
+
+
+let store;
+async function importStorage() {
+  const { default: Store } = await import('electron-store');
+  store = new Store();
+}
+
 
 
 //  quit if on second instance
@@ -22,18 +35,10 @@ if (!gotTheLock) { app.quit(); }
 
 
 
-async function getStorageItem(key, defaultValue) {
-  const storageModule = await import('./storage.mjs');
-  return storageModule.get(key, defaultValue);
-}
-async function setStorageItem(key, data) {
-  const storageModule = await import('./storage.mjs');
-  storageModule.set(key, data);
-}
 
 
 async function autoUpdate() {
-  const autoUpdatePreference = await getStorageItem('autoUpdate');
+  const autoUpdatePreference = store.get('autoUpdate');
 
   if (!autoUpdatePreference) { return }
   autoUpdater.checkForUpdates();
@@ -43,7 +48,7 @@ async function autoUpdate() {
 async function runOnStartup() {
   if (app.isPackaged) return;
 
-  const runOnStartupPreference = await getStorageItem('runOnStartup');
+  const runOnStartupPreference = store.get('runOnStartup');
 
   app.setLoginItemSettings({
     openAtLogin: runOnStartupPreference,
@@ -92,10 +97,34 @@ function createTray() {
 
 
 async function createWin(route, appStart) {
-  //  get bounds or use default
-  const winBounds = await getStorageItem(`winBounds_${route == '' ? 'console' : route}`, { width: 1500, height: 900 });
-  const winMaxState = await getStorageItem(`winMaxState_${route == '' ? 'console' : route}`, false);
+  const splashWin = new BrowserWindow({
+    width: 400,
+    height: 600,
+    frame: false,
+    show: false,
+    alwaysOnTop: true
+  })
 
+
+
+  //  show splash win
+
+  if (appStart) {
+    if (app.isPackaged) { splashWin.loadFile(path.join(app.getAppPath(), 'dist/splash.html')); }
+    else { splashWin.loadURL('http://localhost:5173/splash'); }
+    splashWin.center();
+
+    splashWin.once('ready-to-show', () => {
+      splashWin.show();
+    })
+  }
+
+
+
+
+  //  get bounds or use default
+  const winBounds = store.get(`winBounds_${route == '' ? 'console' : route}`, { width: 1500, height: 900 });
+  const winMaxState = store.get(`winMaxState_${route == '' ? 'console' : route}`, false);
 
 
   const win = new BrowserWindow({
@@ -110,32 +139,22 @@ async function createWin(route, appStart) {
   })
 
 
-  const splashWin = new BrowserWindow({
-    width: 400,
-    height: 600,
-    frame: false,
-    show: false,
-    alwaysOnTop: true
-  })
 
-
-
-  //  show splash win
-
-  if (appStart) {
-    splashWin.loadURL('http://localhost:5173/splash.html');
-    splashWin.center();
-
-    splashWin.once('ready-to-show', () => {
-      splashWin.show();
-    })
+  if (app.isPackaged) { 
+    win.loadFile(path.join(app.getAppPath(), `dist/index.html`), {
+      hash: route
+    });
   }
+  else { win.loadURL(`http://localhost:5173#${route}`); }
+  
+  
 
 
+  win.webContents.on('did-fail-load', (event, errorCode, errorDescription) => {
+    log.error('Failed to load page:', errorDescription);
+  });
 
-  //  load win content
 
-  win.loadURL(`http://localhost:5173${route}`);
 
   win.once('ready-to-show', () => {
     setTimeout(() => {
@@ -150,15 +169,17 @@ async function createWin(route, appStart) {
   //  save persistent win bounds
 
   win.on('close', async () => {
-    await setStorageItem(`winBounds_${route == '' ? 'console' : route}`, win.getBounds());
-    await setStorageItem(`winMaxState_${route == '' ? 'console' : route}`, win.isMaximized());
+    store.set(`winBounds_${route == '' ? 'console' : route}`, win.getBounds());
+    store.set(`winMaxState_${route == '' ? 'console' : route}`, win.isMaximized());
   })
 }
 
 
 
 
-app.on('ready', () => {
+app.on('ready', async () => {
+  await importStorage();
+
   createWin('', true);
   createTray();
   autoUpdate();
@@ -237,18 +258,21 @@ ipcMain.on('exit-app', () => {
 //  Update app management preferences - auto start/update
 ipcMain.on('update-preference', async (e, data) => {
   //  set preference
-  await setStorageItem(data.key, data.value);
+  store.set(data.key, data.value);
 
   //  reset properties to match updated preferences
   if (data.key == 'autoUpdate') autoUpdate();
   else if (data.key == 'runOnStartup') runOnStartup();
 
-  e.reply('get-preference-reply', { key: data.key, preference: data.value });
+  // e.reply('get-preference-reply', { key: data.key, preference: data.value });
+  BrowserWindow.getAllWindows().forEach(win => {
+    win.webContents.send('get-preference-reply', { key: data.key, preference: data.value })
+  })
 })
 
 
 ipcMain.on('get-preference', async (e, key) => {
-  const preference = await getStorageItem(key);
+  const preference = store.get(key);
 
   e.reply('get-preference-reply', { key: key, preference: preference });
 })
