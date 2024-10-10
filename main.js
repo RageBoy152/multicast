@@ -304,14 +304,14 @@ autoUpdater.on('error', (err) => {
   // update error
   
   log.info(`Error during auto update: ${err}`);
-  BrowserWindow.getFocusedWindow().webContents.send('autoUpdate-error',err);
+  BrowserWindow.getAllWindows()[0].webContents.send('autoUpdate-error',err);
 })
 
 autoUpdater.on('update-downloaded', () => {
   // prompt user to restart app now to install update or dismiss
 
   log.info("Update downloaded, prompting restart.");
-  BrowserWindow.getFocusedWindow().webContents.send('autoUpdate-ready');
+  BrowserWindow.getAllWindows()[0].webContents.send('autoUpdate-ready');
 })
 
 
