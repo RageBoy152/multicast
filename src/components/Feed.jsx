@@ -188,7 +188,7 @@ export function Feed({ outputName, feedId, videoId, volume, basisClass = '', hei
 
             <div className="h-[25%] flex flex-col justify-center gap-3">
               <a onClick={() => copyCredits(userData, setUserData, outputName, feedId)} className="bg-accent hover:bg-accent/80 cursor-pointer h-[30px] w-[30px] rounded flex items-center justify-center"><i className="bi bi-clipboard"></i></a>
-              <a href={`https://www.youtube.com/live_chat?is_popout=1&v=${videoId}`} target='_blank' className="bg-accent hover:bg-accent/80 cursor-pointer h-[30px] w-[30px] rounded flex items-center justify-center"><i className="bi bi-chat-left-text"></i></a>
+              <a onClick={() => window.electronAPI.send('openExternal', `https://www.youtube.com/live_chat?is_popout=1&v=${videoId}`)} className="bg-accent hover:bg-accent/80 cursor-pointer h-[30px] w-[30px] rounded flex items-center justify-center"><i className="bi bi-chat-left-text"></i></a>
             </div>
           </> 
         )}
