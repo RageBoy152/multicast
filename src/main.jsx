@@ -6,6 +6,7 @@ import Output from './pages/Output.jsx'
 import '../defaultStyles.css'
 
 
+
 createRoot(document.getElementById('root')).render(
   // <StrictMode>
     <HashRouter>

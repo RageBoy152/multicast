@@ -43,6 +43,7 @@ export default function Console() {
     }
     loadConsoleLog();
 
+    
 
     return () => {
       document.removeEventListener('click', () => {});

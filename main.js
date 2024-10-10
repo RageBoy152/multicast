@@ -6,7 +6,7 @@ const path = require('path');
 if (process.env.NODE_ENV !== 'production')
   require('dotenv').config();
 
-const exePathFull = path.resolve(path.dirname(process.execPath), 'Multi Cast.exe')
+const exePathFull = path.resolve(path.dirname(process.execPath), 'MultiCast.exe')
 
 
 const log = require('electron-log');
@@ -43,6 +43,13 @@ async function autoUpdate() {
   if (!autoUpdatePreference) { return }
   autoUpdater.checkForUpdates();
 }
+
+
+//  check for new update every 10 mins
+setInterval(() => {
+  autoUpdate();
+}, 600000)
+
 
 
 async function runOnStartup() {
@@ -172,6 +179,11 @@ async function createWin(route, appStart) {
     store.set(`winBounds_${route == '' ? 'console' : route}`, win.getBounds());
     store.set(`winMaxState_${route == '' ? 'console' : route}`, win.isMaximized());
   })
+
+
+
+  //  after win is loaded and showing, check for updates
+  autoUpdate();
 }
 
 
@@ -182,7 +194,6 @@ app.on('ready', async () => {
 
   createWin('', true);
   createTray();
-  autoUpdate();
   runOnStartup();
 })
 
@@ -255,13 +266,14 @@ ipcMain.on('exit-app', () => {
 
 
 
+
 //  Update app management preferences - auto start/update
 ipcMain.on('update-preference', async (e, data) => {
   //  set preference
   store.set(data.key, data.value);
 
   //  reset properties to match updated preferences
-  if (data.key == 'autoUpdate') autoUpdate();
+  if (data.key == 'autoUpdate' && data.value) autoUpdate();
   else if (data.key == 'runOnStartup') runOnStartup();
 
   // e.reply('get-preference-reply', { key: data.key, preference: data.value });
