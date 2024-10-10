@@ -46,7 +46,7 @@ async function autoUpdate() {
 
 
 async function runOnStartup() {
-  if (app.isPackaged) return;
+  if (!app.isPackaged) return;
 
   const runOnStartupPreference = store.get('runOnStartup');
 
