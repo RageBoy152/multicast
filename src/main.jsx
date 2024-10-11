@@ -11,9 +11,7 @@ import '../defaultStyles.css'
 
 import Astrolytics from 'astrolytics-desktop';
 
-Astrolytics.init('6708e68a76ab3658de0ec9ea', {
-  disableInDev: true
-});
+Astrolytics.init('6708e68a76ab3658de0ec9ea');
 
 window.electronAPI.invoke("get-app-version").then((version) => {
   Astrolytics.setProps({

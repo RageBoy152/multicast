@@ -13,7 +13,16 @@ import { AppNavBar } from "../components/AppNavBar";
 export default function Output() {
   const [userData, setUserData] = useUserData();
 
+
+  // let outputId = new URL(window.location).searchParams.get('outputId');
+  let outputId = window.location.hash.split('/output?outputId=')[1];
+  let outputObj = userData.outputs.find(outputObj => outputObj.outputId == outputId)
+
+
   useEffect(() => {
+    document.title = outputObj.outputName || 'Output';
+
+
     const syncState = (e) => {
       if (e.key === 'rage.multicast.config')
         setUserData(JSON.parse(e.newValue))
@@ -28,12 +37,6 @@ export default function Output() {
 
   
   console.log(userData)
-
-
-  // let outputId = new URL(window.location).searchParams.get('outputId');
-  let outputId = window.location.hash.split('/output?outputId=')[1];
-  let outputObj = userData.outputs.find(outputObj => outputObj.outputId == outputId)
-
 
 
   return (

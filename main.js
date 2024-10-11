@@ -83,7 +83,7 @@ function createTray() {
         let consoleWin;
 
         BrowserWindow.getAllWindows().forEach(win => {
-          if (win.title == 'MultiCast Console') consoleWin = win; return;
+          if (win.title == 'Console') consoleWin = win; return;
         })
 
         if (consoleWin) {
