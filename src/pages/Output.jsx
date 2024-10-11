@@ -27,11 +27,44 @@ export default function Output() {
       if (e.key === 'rage.multicast.config')
         setUserData(JSON.parse(e.newValue))
     }
-    window.addEventListener('storage', syncState)
+    window.addEventListener('storage', syncState);
+
+
+    //  Autoupdate status receivers for notifying user
+    
+    window.electronAPI.receive('autoUpdate-ready', () => {
+      setUserData((currentUserData) => ({
+        ...currentUserData,
+        notifications: [{
+          "notificationId": crypto.randomUUID(),
+          "timestamp": new Date().toISOString(),
+          "title": "New MultiCast update available",
+          "body": `Update will install automatically on next launch or you can <a onclick="window.electronAPI.send('exit-app')" class='text-text-shade hover:text-text cursor-pointer underline'>restart now</a>`,
+          "status": "info"
+        }, ...currentUserData.notifications]
+      }))
+    })
+    window.electronAPI.receive('autoUpdate-error', (err) => {
+      setUserData((currentUserData) => ({
+        ...currentUserData,
+        notifications: [{
+          "notificationId": crypto.randomUUID(),
+          "timestamp": new Date().toISOString(),
+          "title": "Error during auto update",
+          "body": err,
+          "status": "danger"
+        }, ...currentUserData.notifications]
+      }))
+    })
+
+
 
 
     return () => {
-      window.removeEventListener('storage', syncState)
+      window.removeEventListener('storage', syncState);
+
+      window.electronAPI.receive('autoUpdate-error', () => {});
+      window.electronAPI.receive('autoUpdate-ready', () => {});
     }
   }, [])
 

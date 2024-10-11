@@ -1,4 +1,4 @@
-import { StrictMode } from 'react'
+import { StrictMode, useEffect } from 'react'
 import { HashRouter, Routes, Route } from 'react-router-dom'
 import { createRoot } from 'react-dom/client'
 import Console from './pages/Console.jsx'
@@ -18,7 +18,6 @@ window.electronAPI.invoke("get-app-version").then((version) => {
     version: version
   })
 })
-
 
 
 
