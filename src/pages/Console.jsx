@@ -23,7 +23,7 @@ export default function Console() {
 
 
   useEffect(() => {
-    document.title = 'console';
+    document.title = 'MultiCast Console';
     
     const syncState = (e) => {
       if (e.key === 'rage.multicast.config')

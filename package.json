@@ -2,7 +2,7 @@
   "name": "multicast",
   "productName": "MultiCast",
   "author": "Rage",
-  "description": "MultiCast - View all the Starbase, Texas live streams in one place.",
+  "description": "MultiCast",
   "private": true,
   "version": "2.0.4",
   "main": "main.js",
