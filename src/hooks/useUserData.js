@@ -116,7 +116,7 @@ const defaultConfig = {
     }
   ],
   "notifications": [],
-  "version": "2.0.2"
+  "version": "2.0.3"
 }
 
 
@@ -124,13 +124,13 @@ const defaultConfig = {
 export const forcedNotif = {
   "notificationId": "forced-2024-10-09T134600Z",
   "timestamp": new Date().toISOString(),
-  "title": "MultiCast V2.0.3 is live - Small bug fix",
-  "body": `Read the release notes <a onclick="window.electronAPI.send('openExternal', 'https://github.com/RageBoy152/multicast/releases/tag/2.0.3')" class='text-text-shade hover:text-text cursor-pointer underline'>here</a>`,
+  "title": "MultiCast V2.0.4 is live - Small bug fixes",
+  "body": `Read the release notes <a onclick="window.electronAPI.send('openExternal', 'https://github.com/RageBoy152/multicast/releases/tag/2.0.4')" class='text-text-shade hover:text-text cursor-pointer underline'>here</a>`,
   "status": "info",
   "toasted": true
 }
 
-const version = "2.0.3";
+const version = "2.0.4";
 
 
 function getData() {

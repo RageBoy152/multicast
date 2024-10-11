@@ -4,7 +4,7 @@
   "author": "Rage",
   "description": "MultiCast - View all the Starbase, Texas live streams in one place.",
   "private": true,
-  "version": "2.0.3",
+  "version": "2.0.4",
   "main": "main.js",
   "homepage": "./",
   "scripts": {
@@ -49,6 +49,7 @@
     }
   },
   "dependencies": {
+    "astrolytics-desktop": "^1.1.1",
     "bootstrap-icons": "^1.11.3",
     "concurrently": "^9.0.1",
     "cross-env": "^7.0.3",

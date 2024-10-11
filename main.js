@@ -20,6 +20,8 @@ autoUpdater.autoInstallOnAppQuit = true;
 
 
 
+
+
 let store;
 async function importStorage() {
   const { default: Store } = await import('electron-store');
@@ -203,6 +205,13 @@ app.on('ready', async () => {
 //  Open output window
 ipcMain.on('open-output', (e, route) => {
   createWin(route);
+})
+
+
+
+//  Send app version to renderer
+ipcMain.handle('get-app-version', () => {
+  return app.getVersion();
 })
 
 

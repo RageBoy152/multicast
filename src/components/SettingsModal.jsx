@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { toggleModal } from '../utils/toggleModal';
 
+import Astrolytics from 'astrolytics-desktop';
+
 
 
 export function SettingsModal({ userData, setUserData }) {
@@ -16,12 +18,12 @@ export function SettingsModal({ userData, setUserData }) {
   useEffect(() => {
     window.electronAPI.send('get-preference', 'autoUpdate');
     window.electronAPI.send('get-preference', 'runOnStartup');
-    window.electronAPI.send('get-preference', 'feedFunBarMode');
+    window.electronAPI.send('get-preference', 'feedFuncBarMode');
 
     const handlePreferenceReply = (data) => {
       if (data.key == 'autoUpdate') setNewAutoUpdate(data.preference);
       else if (data.key == 'runOnStartup') setNewRunOnStartup(data.preference);
-      else if (data.key == 'feedFunBarMode') setNewFeedFuncBarMode(data.preference);
+      else if (data.key == 'feedFuncBarMode') setNewFeedFuncBarMode(data.preference);
     }
 
     window.electronAPI.receive('get-preference-reply', handlePreferenceReply);
@@ -34,6 +36,11 @@ export function SettingsModal({ userData, setUserData }) {
 
 
   function setPreference(key, newPreference) {
+    Astrolytics.track('set-settings-preference', {
+      setting: key,
+      value: newPreference
+    });
+    
     window.electronAPI.send('update-preference', { key: key, value: newPreference });
   }
 
@@ -148,11 +155,10 @@ export function SettingsModal({ userData, setUserData }) {
           <p className="text-l">Feed sidebar visibility</p>
 
           <section className="slider-checkbox">
-            <select className='bg-secondary px-2 py-1' value={newFeedFuncBarMode} onChange={(e) => setPreference('feedFunBarMode', e.target.value)}>
+            <select className='bg-secondary px-2 py-1' value={newFeedFuncBarMode} onChange={(e) => setPreference('feedFuncBarMode', e.target.value)}>
               <option value="hover">Visible on hover</option>
               <option value="always">Always visible</option>
             </select>
-            {/* <input className="slider-input" type="checkbox" onChange={(e) => setPreference('feedFunBarMode', e.target.value)} id="c3" /> */}
           </section>
         </div>
 

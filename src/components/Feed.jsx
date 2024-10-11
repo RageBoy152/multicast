@@ -57,10 +57,10 @@ export function Feed({ outputName, feedId, videoId, volume, basisClass = '', hei
   
   useEffect(() => {
     //  Get preferences from main
-    window.electronAPI.send('get-preference', 'feedFunBarMode');
+    window.electronAPI.send('get-preference', 'feedFuncBarMode');
 
     const handlePreferenceReply = (data) => {
-      if (data.key == 'feedFunBarMode') { setFeedFuncBarMode(data.preference); setFeedFuncsHidden(data.preference == 'hover' ? true : false) }
+      if (data.key == 'feedFuncBarMode') { setFeedFuncBarMode(data.preference); setFeedFuncsHidden(data.preference == 'hover' ? true : false) }
     }
 
     window.electronAPI.receive('get-preference-reply', handlePreferenceReply);

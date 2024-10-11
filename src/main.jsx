@@ -7,6 +7,25 @@ import '../defaultStyles.css'
 
 
 
+//  ANALYTICS
+
+import Astrolytics from 'astrolytics-desktop';
+
+Astrolytics.init('6708e68a76ab3658de0ec9ea', {
+  disableInDev: true
+});
+
+window.electronAPI.invoke("get-app-version").then((version) => {
+  Astrolytics.setProps({
+    version: version
+  })
+})
+
+
+
+
+
+
 createRoot(document.getElementById('root')).render(
   // <StrictMode>
     <HashRouter>
