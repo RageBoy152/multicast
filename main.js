@@ -184,8 +184,8 @@ async function createWin(route, appStart) {
 
 
 
-  //  after win is loaded and showing, check for updates
-  autoUpdate();
+  //  after win is loaded and showing, check for updates  -  only on app start
+  if (appStart) autoUpdate();
 }
 
 
