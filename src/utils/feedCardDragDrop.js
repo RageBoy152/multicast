@@ -22,7 +22,12 @@ export function feedCardDrop(e, targetFeedIndex, targetFeedId, targetOutputName,
 
   // console.log(`FROM\nfeedId: ${originFeedId}\noutputName: ${originOutputName}\n\nTO\nfeedIndex: ${targetFeedIndex}\nfeedId: ${targetFeedId}\noutputName: ${targetOutputName}`);
 
+
+
+  //  return if droping from feedlist to feedlist
+  if (originOutputName == 'undefined' && targetFeedIndex == null && targetOutputName == null) { e.preventDefault(); return; }
   
+
   
   setUserData((currentUserData) => {
     let movedFeedObj = {};

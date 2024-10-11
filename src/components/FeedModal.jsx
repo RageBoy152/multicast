@@ -23,16 +23,20 @@ export function FeedModal({ setUserData, editFeedObj, setEditFeedObj }) {
     if (!newFeedName.match(/[\w]/)) { setNameInputErr('Invalid name'); invalid = true; }
     else { setNameInputErr(''); }
     
-    if (!newFeedSource.match(/^(https|http)+\:\/\/+(www.|)+youtube+\.+com+(\/live|\/watch)+\?v=+[\w\-\_0-9]+$/)) { setSourceInputErr('Invalid source'); invalid = true; }
-    else  { setSourceInputErr(''); }
-    
-    
+
+    let videoURL = '';
+    try {
+      videoURL = new URL(newFeedSource);
+      setSourceInputErr('');
+    } catch (err) {
+      setSourceInputErr('Invalid source'); invalid = true;
+    }
+
     if (invalid) return;
 
 
-    let videoURL = new URL(newFeedSource);
-    let videoId = videoURL.searchParams.get('v');
 
+    let videoId = videoURL.pathname.includes('/live/') ? videoURL.pathname.split('/live/')[1].split('?')[0] : videoURL.searchParams.get('v');
 
   
     let newFeedObj = {
