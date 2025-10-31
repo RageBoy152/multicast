@@ -263,7 +263,8 @@ export function Feed({ outputName, feedId, videoId, volume, basisClass = '', hei
       </div>
       <div className={`bg-accent transition-all duration-150 ease-linear ${feedFuncsHidden ? 'w-full' : 'w-[calc(100%-45px)]'} h-full`}>
         {/* <webview id={feedId} src={`https://www.youtube.com/embed/${videoId}`} referrerpolicy="strict-origin-when-cross-origin" className='h-full' /> */}
-        <iframe src={`https://www.youtube.com/embed/${videoId}?autoplay=1`} allowFullScreen className='w-full h-full' />
+        {/* <iframe src={`http://localhost:5174/embed?v=${videoId}`} allowFullScreen className='w-full h-full' /> */}
+        <iframe src={`https://multicast.watch/embed?v=${videoId}`} allowFullScreen className='w-full h-full' />
       </div>
     </div>
   )
