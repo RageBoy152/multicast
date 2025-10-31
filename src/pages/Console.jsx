@@ -93,10 +93,10 @@ export default function Console() {
       <SettingsModal userData={userData} setUserData={setUserData} />
       <BugReportModal setUserData={setUserData} />
       <ContextMenu setUserData={setUserData} userData={userData} editFeedObj={editFeedObj} setEditFeedObj={setEditFeedObj} />
-      <AppNavBar />
+      <AppNavBar version={userData.version} />
       <main className="flex">
         <FeedListSideBar feedListData={userData.feedList} setUserData={setUserData} />
-        <OutputList outputsData={userData.outputs} setUserData={setUserData} />
+        <OutputList version={userData.version} outputsData={userData.outputs} setUserData={setUserData} />
       </main>
       <NavBar notifications={userData.notifications} setUserData={setUserData} forcedNotif={forcedNotif} />
     </>

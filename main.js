@@ -3,6 +3,10 @@ const { app, BrowserWindow, ipcMain, shell, Tray, Menu } = require('electron');
 const nodemailer = require('nodemailer');
 const path = require('path');
 
+const os = require('os');
+const fs = require('fs');
+const child_process = require('child_process');
+
 if (process.env.NODE_ENV !== 'production')
   require('dotenv').config();
 
@@ -120,7 +124,7 @@ async function createWin(route, appStart) {
 
   if (appStart) {
     if (app.isPackaged) { splashWin.loadFile(path.join(app.getAppPath(), 'dist/splash.html')); }
-    else { splashWin.loadURL('http://localhost:5173/splash'); }
+    else { splashWin.loadURL(`http://localhost:5173/splash?version=${app.getVersion()}`); }
     splashWin.center();
 
     splashWin.once('ready-to-show', () => {
@@ -271,8 +275,112 @@ ipcMain.on('openExternal', (e, url) => {
 //  Quit entire app - used for autoupdate 'restart now' button
 ipcMain.on('exit-app', () => {
   app.quit();
-})
+});
 
+
+
+//  RUN CMD
+// function runCmd(cmd, args, callback) {
+//   let child = child_process.spawn(cmd, args, {
+//     encoding: 'utf8',
+//     shell: true
+//   });
+
+//   child.on('error', err => {
+//     console.log(`Error running command | ${err}`);
+//   });
+
+//   child.stdout.setEncoding('utf8');
+//   child.stdout.on('data', data => {
+//     if (typeof callback === 'function') callback(data);
+//   });
+
+//   child.on('close', code => {
+//     if (typeof callback === 'function') callback({ finished: true, code: code });
+//     child = null;
+//   });
+// }
+
+
+
+// async function runInitialCommand(e, cmd) {
+//   return new Promise((resolve, reject) => {
+//     runCmd(cmd, null, (res) => {
+//       try {
+//         // FINISHED
+//         if (res.finished) {
+//           if (res.code == 0) {
+//             e.reply('pull-loading', { percent: 0.2, status: "Executed initial pull command." });
+//             resolve(true);
+//           }
+//           else {
+//             reject(new Error(`Initial pull command failed. Finished with code ${res.code}`));
+//           }
+//         }
+  
+//         // DOWNLOADING
+//         else if (res.toString().includes('[download]') && res.toString().includes(' (frag ')) {
+//           percent = res.split('(frag ')[1].split(')')[0];
+//           percentValue = parseInt(percent.split('/')[0]) / parseInt(percent.split('/')[1]);
+  
+//           console.log("Downloading video");
+  
+//           e.reply('pull-loading', { percent: percentValue, status: "Downloading video." });
+//         }
+  
+//         // SOMETHING ELSE
+//         else {
+//           console.log("Command execution status:");
+//           console.log(res);
+//         }
+//       }
+//       catch (err) {
+//         console.error("Error in pull command callback: ", err);
+//         e.reply('pull-error', err.message);
+//         reject(err);
+//       }
+//     });
+//   });
+// }
+
+
+
+//  REQUEST TO PULL GIF
+// ipcMain.on('pull-start', async (e, pullOptions) => {
+//   try {
+//     console.log(`STARTING PULL ON #${pullOptions.videoId} WITH:\nPoint0: -${pullOptions.point0}\nPoint1: -${pullOptions.point1}\nLength: ${pullOptions.point0 - pullOptions.point1}s`);
+    
+
+//     // pull logic here
+//     const pullsTempDir = `${os.homedir()}\\Pictures\\MultiCast\\temp`;
+//     const pullFileNameSubstr = `${new Date().toISOString()}_${pullOptions.videoId}`;
+
+
+//     e.reply('pull-loading', { percent: 0.1, status: "Confirming temp directory exists." });
+//     fs.mkdirSync(pullsTempDir, { recursive: true });
+    
+    
+//     //  INITIAL PULL (MP4)
+//     e.reply('pull-loading', { percent: 0.2, status: "Creating initial pull command." });
+
+//     const initialPullFileDir = `${pullsTempDir}\\${pullFileNameSubstr}_InitialDownload`;
+//     const initialPullCmd = `yt-dlp "https://www.youtube.com/live/${pullOptions.videoId}" --verbose --live-from-start --download-sections "#-${pullOptions.point0} - -${pullOptions.point1}" -o "${initialPullFileDir}"`;
+    
+//     console.log(initialPullCmd);
+//     e.reply('pull-loading', { percent: 0.3, status: "Running initial pull command." });
+
+
+//     try { await runInitialCommand(e, initialPullCmd); }
+//     catch (err) { throw new Error("Initial command failed: " + err.message); }
+
+
+//     e.reply('pull-finish', "yay");
+//   }
+//   catch (err) {
+//     console.error("Error pulling GIF: ", err);
+//     e.reply('pull-error', err.message);
+//   }
+// })
 
 
 

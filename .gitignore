@@ -4,3 +4,4 @@ node_modules
 .env
 build-script-rage.js
 releases
+_internal

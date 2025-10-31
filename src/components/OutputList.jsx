@@ -1,14 +1,14 @@
 import { OutputCard } from "./OutputCard";
 
 
-export function OutputList({ outputsData, setUserData }) {
+export function OutputList({ outputsData, setUserData, version }) {
   return (
     <section className="flex flex-col items-center w-full h-[calc(100vh-50px-33px)] overflow-auto">
       <div className="w-10/12 py-4">
         <div className="text-xxl flex items-center justify-between">
           <h1>Outputs</h1>
           <p className="text-xs">
-            MultiCast V2.0.7 | Developed by <a onClick={() => window.electronAPI.send('openExternal', 'https://discord.com/users/693191740961718420')} className="text-text-shade hover:text-text cursor-pointer underline">Rage</a>
+            MultiCast V{version} | Developed by <a onClick={() => window.electronAPI.send('openExternal', 'https://discord.com/users/693191740961718420')} className="text-text-shade hover:text-text cursor-pointer underline">Rage</a>
           </p>
         </div>
       </div>

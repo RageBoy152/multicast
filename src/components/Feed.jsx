@@ -32,7 +32,11 @@ export function Feed({ outputName, feedId, videoId, volume, basisClass = '', hei
   const [newVolume, setNewVolume] = useState(volume);
   const [feedFuncsHidden, setFeedFuncsHidden] = useState(false);
 
-  const [feedFuncBarMode, setFeedFuncBarMode] = useState(true);
+  const [feedFuncBarMode, setFeedFuncBarMode] = useState("always");
+
+  const [pullPoints, setPullPoints] = useState({ point0: 10, point1: 0 });
+  const [playHeadValue, setPlayHeadValue] = useState(0);    // -X seconds from live
+
 
 
   function setVol(e) {
@@ -54,13 +58,40 @@ export function Feed({ outputName, feedId, videoId, volume, basisClass = '', hei
     }))
   }
 
+
+
+  function setPoint(point) {
+    setPullPoints((prev) => ({ point0: point === 0 ? playHeadValue : prev.point0, point1: point === 1 ? playHeadValue : prev.point1 }));
+  }
+
+
+
+  // function startPull() {
+  //   electronAPI.send('pull-start', { videoId: videoId, ...pullPoints });
+
+  //   electronAPI.receive('pull-loading', (loading) => {
+  //     console.log(`Pulling... (${loading.percent * 100}%) | ${loading.status}`);
+  //   });
+
+  //   electronAPI.receive('pull-finish', (res) => {
+  //     console.log("Finished pull.");
+  //     console.log(res);
+  //   });
+
+  //   electronAPI.receive('pull-error', (err) => {
+  //     console.error("Error pulling GIF:");
+  //     console.error(err);
+  //   });
+  // }
+
+
   
   useEffect(() => {
     //  Get preferences from main
     window.electronAPI.send('get-preference', 'feedFuncBarMode');
 
     const handlePreferenceReply = (data) => {
-      if (data.key == 'feedFuncBarMode') { setFeedFuncBarMode(data.preference); setFeedFuncsHidden(data.preference == 'hover' ? true : false) }
+      if (data.key == 'feedFuncBarMode') { setFeedFuncBarMode(data.preference); setFeedFuncsHidden(data.preference != 'always') }
     }
 
     window.electronAPI.receive('get-preference-reply', handlePreferenceReply);
@@ -75,14 +106,9 @@ export function Feed({ outputName, feedId, videoId, volume, basisClass = '', hei
 
 
 
-    webview.addEventListener('did-finish-load', () => {
-      // webview.openDevTools();
-
-
-      webview.addEventListener('console-message', (e) => {
-        if (!e.message.includes('AUDIO-DB_')) return;
-
-        const dB = parseInt(e.message.split('AUDIO-DB_')[1]);
+    //  READ AUDIO
+    function parseAudioReading(message) {
+      const dB = parseInt(message.split('_')[1]);
 
         const minDB = -60;
         const maxDB = 12;
@@ -92,7 +118,30 @@ export function Feed({ outputName, feedId, videoId, volume, basisClass = '', hei
         const meterValue = isNaN(normalizedDB) ? 100 : (100 - (normalizedDB)) * 0.8;
 
         $(`#volInput_${feedId}`).css({'--clip-top': `${meterValue}%`});
-      })
+    }
+
+
+
+    //  READ PULL POINT
+    function parsePlayheadPosition(message) {
+      const positionValue = message.split('_')[1];
+
+      // console.log(`Playhead position: ${positionValue}`);
+      setPlayHeadValue(positionValue);
+    }
+
+
+
+    webview.addEventListener('did-finish-load', () => {
+      webview.openDevTools();
+
+
+      webview.addEventListener('console-message', (e) => {
+        if (e.message.includes('AUDIO-DB_')) { parseAudioReading(e.message); }
+        else if (e.message.includes('PLAYHEAD-POSITION_')) { parsePlayheadPosition(e.message); }
+        else { return; }
+      });
+
 
 
       webview.executeJavaScript(`
@@ -158,6 +207,18 @@ export function Feed({ outputName, feedId, videoId, volume, basisClass = '', hei
         }
 
         setInterval(logAudioLevel, 100);
+
+
+
+        //  send back playhead position
+
+        function logPlayheadPos() {
+          const maxVal = parseInt(document.querySelector('.ytp-progress-bar').getAttribute('aria-valuemax'));
+          const currentVal = parseInt(document.querySelector('.ytp-progress-bar').getAttribute('aria-valuenow'));
+
+          console.log('PLAYHEAD-POSITION_'+ (maxVal-currentVal));
+        }
+        setInterval(logPlayheadPos, 100);
       `, true)
     })
 
@@ -183,10 +244,16 @@ export function Feed({ outputName, feedId, videoId, volume, basisClass = '', hei
       <div className={`bg-primary flex flex-col items-center h-full transition-all duration-150 ease-linear ${feedFuncsHidden ? 'w-0' : 'w-[45px] px-2'}`}>
         {!feedFuncsHidden && (
           <>
-            <p className="text-xs h-[10%] flex items-center">{newVolume}%</p>
-            <input id={`volInput_${feedId}`} className="volumeInput h-[65%]" type="range" min={0} max={100} value={newVolume} onChange={setVol} />
+            {/* <p className="text-xs h-[10%] flex items-center">{newVolume}%</p> */}
+            {/* <input id={`volInput_${feedId}`} className="volumeInput h-[65%]" type="range" min={0} max={100} value={newVolume} onChange={setVol} /> */}
 
-            <div className="h-[25%] flex flex-col justify-center gap-3">
+            <div className="h-[100%] flex flex-col justify-center gap-3 text-xs">
+              {/* <div className="flex w-full justify-between gap-2">
+                <a onClick={() => setPoint(0)} className="bg-accent hover:bg-accent/80 cursor-pointer h-[20px] w-1/2 rounded-sm flex items-center justify-center">A</a>
+                <a onClick={() => setPoint(1)} className="bg-accent hover:bg-accent/80 cursor-pointer h-[20px] w-1/2 rounded-sm flex items-center justify-center">B</a>
+              </div>
+              <a onClick={startPull} className="bg-accent hover:bg-accent/80 cursor-pointer h-[20px] w-[30px] rounded flex items-center justify-center">P</a> */}
+
               <a onClick={() => copyCredits(userData, setUserData, outputName, feedId)} className="bg-accent hover:bg-accent/80 cursor-pointer h-[30px] w-[30px] rounded flex items-center justify-center"><i className="bi bi-clipboard"></i></a>
               <a onClick={() => window.electronAPI.send('openExternal', `https://www.youtube.com/live_chat?is_popout=1&v=${videoId}`)} className="bg-accent hover:bg-accent/80 cursor-pointer h-[30px] w-[30px] rounded flex items-center justify-center"><i className="bi bi-chat-left-text"></i></a>
             </div>
@@ -195,7 +262,8 @@ export function Feed({ outputName, feedId, videoId, volume, basisClass = '', hei
         
       </div>
       <div className={`bg-accent transition-all duration-150 ease-linear ${feedFuncsHidden ? 'w-full' : 'w-[calc(100%-45px)]'} h-full`}>
-        <webview id={feedId} src={`https://youtube.com/embed/${videoId}?autoplay=1`} className='h-full' />
+        {/* <webview id={feedId} src={`https://www.youtube.com/embed/${videoId}`} referrerpolicy="strict-origin-when-cross-origin" className='h-full' /> */}
+        <iframe src={`https://www.youtube.com/embed/${videoId}?autoplay=1`} allowFullScreen className='w-full h-full' />
       </div>
     </div>
   )

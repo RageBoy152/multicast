@@ -158,6 +158,7 @@ export function SettingsModal({ userData, setUserData }) {
             <select className='bg-secondary px-2 py-1' value={newFeedFuncBarMode} onChange={(e) => setPreference('feedFuncBarMode', e.target.value)}>
               <option value="hover">Visible on hover</option>
               <option value="always">Always visible</option>
+              <option value="never">Never visible</option>
             </select>
           </section>
         </div>

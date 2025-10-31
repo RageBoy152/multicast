@@ -66,15 +66,12 @@ export default function Output() {
       window.electronAPI.receive('autoUpdate-error', () => {});
       window.electronAPI.receive('autoUpdate-ready', () => {});
     }
-  }, [])
-
-  
-  console.log(userData)
+  }, []);
 
 
   return (
     <>
-      <AppNavBar />
+      <AppNavBar version={userData.version} />
       <NotificationToastList setUserData={setUserData} notifications={userData.notifications} />
       <OutputCardPreview outputFeeds={outputObj.feeds} {...outputObj} inOutput={true} setUserData={setUserData} userData={userData} />
     </>
