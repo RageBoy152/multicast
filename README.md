@@ -1,7 +1,7 @@
-# MultiCast - [Download](https://multicast.watch/download)
+# MultiCast - [Download](https://multicast-web.netlify.app/download)
 
 MultiCast has received a major overhaul.
-Along with the application, there is also a [web version of MultiCast](https://multicast.watch).
+Along with the application, there is also a [web version of MultiCast](https://multicast-web.netlify.app).
 
 
 # How to Use
